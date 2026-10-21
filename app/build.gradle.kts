@@ -80,6 +80,9 @@ android {
 
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        providers.gradleProperty("poiCompatibilityAssets").orNull?.let {
+            getByName("androidTest").assets.srcDir(it)
+        }
     }
 
     packaging {

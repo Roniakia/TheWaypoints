@@ -115,6 +115,18 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ## Release notes
 
+### v0.95 — unreleased
+
+- Add the Android storage foundation for regional offline POI packs: verified
+  archive installation, atomic replacement, recovery after interruption, and
+  removal independent of bookmarks.
+- Add local category/name search, English aliases for non-Latin POI names,
+  accent-insensitive Latin queries, nearest/name ordering, overlapping-region
+  deduplication, and pagination beyond 30 results.
+- This foundation is not connected to the app screens yet. Region selection,
+  signed catalogue downloads, and background updates are still in development.
+  Existing online search and bookmarks remain the visible app behavior.
+
 ### v0.94 — stable, 2026-10-21
 
 Promoted from the user-accepted `v0.94-beta.1` without rebuilding or replacing

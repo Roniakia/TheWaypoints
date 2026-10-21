@@ -129,3 +129,51 @@ publishing and merging. The existing GitHub prerelease was promoted to stable
 0.94 with the same tag, source commit, APK and other assets. No build or test
 rerun was needed for promotion; subsequent changes record acceptance in docs only.
 The model and KOS version were not specified.
+
+## Offline regional storage foundation (0.95 / 6, unreleased)
+
+On 2026-10-21, `:app:testDebugUnitTest` passed 17 tests, and the API 35 emulator
+passed 25 instrumentation tests (18 existing and 7 regional storage tests).
+`:app:lintDebug` passed with warnings; debug/test APK assembly succeeded as part
+of instrumentation. Tests used `-PlocalBuild=true` so the `.local` test app did
+not replace the existing signed beta. A first attempt with the normal app ID
+was blocked by the expected signing-certificate mismatch, before running tests.
+
+The synthetic archive is produced by the separate Python pipeline, with 66 POIs.
+Coverage includes Android FTS4/category queries, English aliases for Ukrainian
+and Japanese names, Latin accents, nearest ordering, two-page access beyond 30
+results, typed OSM identity, deduplication across overlapping packs, atomic
+replacement/removal, checksum/metadata mismatch, cancellation, ZIP traversal and
+extraction limits, and restart recovery of an AtomicFile backup/orphan snapshot.
+No Room schema or migration changed.
+
+The optional real Skåne test also passed with pack
+`se-skane-2026-10-prototype.2.zip` (SHA-256
+`afba3859c838dbee016ff72c375977482170735496c2119801a09555b856a566`),
+containing 19,159 POIs. Single illustrative emulator measurements: first
+alphabetic page across all POIs 318 ms; nearest-first `water` search 4 ms,
+137 matches, first 50 returned. These are not statistical benchmarks or Karoo
+measurements. The test does not contact OSM or GitHub.
+
+Stock Android SQLite lacks RTree. The pack's optional desktop RTree is unused;
+Android searches regular coordinates and FTS4. FTS4 integrity validation requires
+a writable staging connection on this emulator; installed databases are opened
+read-only. Lint caught an API 24 Comparator call; the final implementation uses
+the API 23-compatible Collections reverse comparator. Minimum-API runtime
+coverage, actual Karoo performance, network/background downloads, signature
+verification, and the new screens remain pending.
+
+To include the real pack, put `real.zip` plus `real-descriptor.json` into an
+external directory. The descriptor contains `id`, `revision`, `sha256`,
+`download_bytes`, `database_bytes` and `poi_count` from the generator's build
+report. Run on an explicitly selected emulator:
+
+```sh
+ANDROID_SERIAL=<emulator-serial> ./gradlew :app:connectedDebugAndroidTest \
+  -PlocalBuild=true -PpoiCompatibilityAssets=<absolute-assets-directory>
+```
+
+Without that optional directory the real-pack test is skipped, while the
+synthetic fixture and regression tests still run. Neither real nor synthetic
+test packs are included in production APK assets. Region screens and a beta
+with user-visible offline behavior are the next integration phase.
