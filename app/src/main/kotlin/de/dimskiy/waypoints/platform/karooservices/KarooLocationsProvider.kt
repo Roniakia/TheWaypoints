@@ -11,19 +11,19 @@ import de.dimskiy.waypoints.platform.di.BaseModule
 import io.hammerhead.karooext.KarooSystemService
 import io.hammerhead.karooext.models.OnLocationChanged
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.seconds
 
 private const val GPS_SEARCH_TIMEOUT_SEC = 10
@@ -41,18 +41,21 @@ class KarooLocationsProvider @Inject constructor(
 
     override fun observeDeviceLocations(): Flow<DataResult<DeviceLocation>> = channelFlow {
         withContext(coroutineDispatcher) {
-            withTimeout(GPS_SEARCH_TIMEOUT_SEC.seconds) {
+            val result = withTimeoutOrNull(GPS_SEARCH_TIMEOUT_SEC.seconds) {
+                var location: DataResult<DeviceLocation>? = null
                 karooServiceProvider.ensureConnected { service ->
-                    send(getLocation(service))
+                    location = getLocation(service)
                 }
+                location
             }
+            send(result ?: getCachedResultOrError())
         }
         awaitCancellation()
     }.onStart {
         emit(DataResult.loading(context.getString(R.string.message_finding_the_location)))
     }
 
-    private suspend fun getLocation(service: KarooSystemService): DataResult<DeviceLocation> = try {
+    private suspend fun getLocation(service: KarooSystemService): DataResult<DeviceLocation> {
         Timber.d("Starting device location discovery")
 
         val locationResult = getCurrentLocationResult(service).mapResult {
@@ -64,20 +67,14 @@ class KarooLocationsProvider @Inject constructor(
         }
         lastLocationCache.emit(locationResult)
         Timber.d("Location cache update: $locationResult")
-        locationResult
-
-    } catch (e: TimeoutCancellationException) {
-        Timber.d("Device location discovery TIMEOUT")
-        getCachedResultOrError()
+        return locationResult
     }
 
     private suspend fun getCurrentLocationResult(service: KarooSystemService): DataResult<OnLocationChanged> {
-        var consumerId: String? = null
-
-        val locationResult = suspendCancellableCoroutine { continuation ->
-            consumerId = service.addConsumer<OnLocationChanged>(
+        return locationEvents(register = { emit ->
+            service.addConsumer<OnLocationChanged>(
                 onError = {
-                    continuation.resume(
+                    emit(
                         DataResult.error<OnLocationChanged>(
                             DomainError.LocationServiceError(message = it)
                         )
@@ -85,17 +82,10 @@ class KarooLocationsProvider @Inject constructor(
                 },
                 onEvent = { location ->
                     Timber.d("Location discovered: $location")
-                    continuation.resume(DataResult.ready(location))
+                    emit(DataResult.ready(location))
                 }
             )
-        }
-
-        consumerId?.let {
-            service.removeConsumer(it)
-            Timber.d("Location consumer ($it) removed")
-        }
-
-        return locationResult
+        }, remove = service::removeConsumer).first()
     }
 
     private fun getCachedResultOrError(): DataResult<DeviceLocation> = lastLocationCache.value
@@ -109,4 +99,10 @@ class KarooLocationsProvider @Inject constructor(
                 message = context.getString(R.string.error_msg_no_location)
             )
         )
+}
+
+internal fun locationEvents(register: ((DataResult<OnLocationChanged>) -> Unit) -> String,
+    remove: (String) -> Unit): Flow<DataResult<OnLocationChanged>> = callbackFlow {
+    val id = register { trySend(it) }
+    awaitClose { remove(id) }
 }

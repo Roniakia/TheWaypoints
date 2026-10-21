@@ -25,6 +25,9 @@ googleGson = "2.13.1"
 kotlinxSerialization = "1.8.1"
 swipeView = "1.0.1"
 splash = "1.0.1"
+# Keep SDK 35 / API 23 and the existing Lifecycle/Compose combination.
+work = "2.10.5"
+tink = "1.18.0"
 
 #Tests
 junit = "4.13.2"
@@ -43,6 +46,8 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "androidxHilt" }
 androidx-room = { id = "androidx.room", version.ref = "androidxRoom" }
 
 [libraries]
+androidx-work = { module = "androidx.work:work-runtime", version.ref = "work" }
+google-tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
@@ -83,6 +88,7 @@ swipeview-compose = { module = "com.github.SimformSolutionsPvtLtd:SSJetpackCompo
 
 
 test-junit = { module = "junit:junit", version.ref = "junit" }
+test-work = { module = "androidx.work:work-testing", version.ref = "work" }
 test-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
 test-androidx-junit-ext = { module = "androidx.test.ext:junit-ktx", version.ref = "androidxTestExt" }
 test-androidx-core = { module = "androidx.test:core-ktx", version.ref = "androidxTestCore" }

@@ -37,7 +37,9 @@ or configuration file is required to build the app.
 
 Online searches send the query and language to Photon through Karoo's HTTP
 service. Nearby searches also send location coordinates to bias the results.
-Bookmarks and the cached search location are stored locally.
+Bookmarks and the cached search location are stored locally. In development 0.95,
+regional packs and signed catalogue updates download directly from GitHub. Region
+recommendations use position or locale locally; no analytics is added.
 
 ## Compatibility
 
@@ -119,9 +121,29 @@ The reusable [regional pack generator](server/poi_packs/README.md) runs on a lap
 or server. The first Skåne candidate contains 19,159 POIs in a 2.32 MB download.
 See the [measurements and limitations](docs/OFFLINE_POI_PROTOTYPE.md).
 Data releases use separate `poi-data-*` tags and never replace the latest app release.
-The stable 0.94 app does not yet import these packs; Android integration is next.
+The Android integration is implemented in this PR; its verification is recorded
+in the local testing guide.
 
 ## Release notes
+
+### v0.95 — unreleased
+
+- Add compact POIs and Regions screens, with the page menu beside search and a
+  first-run region download invitation.
+- Browse searchable region hierarchies, downloaded regions first and local
+  recommendations next. Update selected regions (including missing downloads),
+  update all downloaded regions, cancel downloads, or remove a region.
+- Search downloaded POIs by name, English transliteration, category and synonyms;
+  preserve native-script names and queries. Use expandable type filters,
+  nearest/name ordering, and pagination beyond 30 results.
+- Verify signed catalogues and pack checksums; download in the background with
+  resume/retry and atomic replacement. Bookmarks survive region removal.
+- Preserve Photon online search and native Karoo map handoff. Fix the wasted
+  platform title bar and location callback cancellation/duplicate events.
+- Add WorkManager 2.10.5 and Tink 1.18.0 without changing Compose/Lifecycle pins.
+- Initial catalogue offers the Skåne prototype only. New screens are English and
+  offline distances are metric; Karoo device testing and API 23 runtime testing
+  remain pending. This does not add offline maps or routing.
 
 ### POI data 2026-10-prototype.2 — prerelease, 2026-10-21
 
@@ -131,14 +153,15 @@ The stable 0.94 app does not yet import these packs; Android integration is next
   catalogue with a separate Ed25519 data-signing identity.
 - Add generation/download validation and ten server tests. One invalid source-wide
   swimming-area geometry is documented for review.
-- Data-only prototype: no APK, no app version change, and no current app import support.
+- Data-only prototype: no APK or app version change was included in that release.
 - [Download the data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2).
   All seven public assets, their checksums and the pinned-key catalogue signature
   were verified after publication. App 0.94 remains the latest stable release.
 - The separate Android foundation ([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3))
   reads the real pack on API 35; 17 JVM tests, 25 emulator tests and lint pass.
   Android uses regular coordinates/FTS4 because stock SQLite lacks RTree.
-  Download/UI integration and real Karoo performance remain unverified.
+  Those were intermediate foundation results; later Android download/UI checks
+  are recorded in [LOCAL_TESTING.md](docs/LOCAL_TESTING.md).
 
 
 ### v0.94 — stable, 2026-10-21
