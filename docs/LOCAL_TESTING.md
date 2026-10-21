@@ -129,3 +129,19 @@ publishing and merging. The existing GitHub prerelease was promoted to stable
 0.94 with the same tag, source commit, APK and other assets. No build or test
 rerun was needed for promotion; subsequent changes record acceptance in docs only.
 The model and KOS version were not specified.
+
+## Regional POI server prototype
+
+Use an isolated Python environment and `server/poi_packs/requirements.txt`.
+Run `PYTHONPATH=server/poi_packs python -m unittest discover -s server/poi_packs/tests -v`.
+Ten server tests pass, covering signature tampering, catalogue validation, safe
+fetch/checksum failure, category safety/membership, transliteration/aliases, empty
+region cleanup, out-of-order area events, and synthetic OSM-to-ZIP integration
+including polygons, multipolygons, geometry omissions, FTS, RTree and nearby sorting.
+These do not establish Karoo performance; real-data measurements are recorded
+separately in [OFFLINE_POI_PROTOTYPE.md](OFFLINE_POI_PROTOTYPE.md).
+
+The initial Android unit-test command hit sandbox cache/socket restrictions. With
+the existing temporary JDK/SDK/cache and approved local execution,
+`:app:testDebugUnitTest` completed successfully with all 31 tasks up to date; this
+reused existing outputs rather than executing fresh Android tests. App code is unchanged.

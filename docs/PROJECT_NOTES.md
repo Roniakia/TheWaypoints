@@ -201,3 +201,18 @@ internal Kotlin namespace is retained to avoid an unrelated source rename.
 The app installs alongside upstream and starts with independent storage.
 Update metadata points to this repository. A dedicated private signing key is
 kept outside the repository; preserve a private backup for future updates.
+
+## Offline regional POI work (in progress)
+
+Agreed scope is recorded in [OFFLINE_POI_PLAN.md](OFFLINE_POI_PLAN.md).
+Server-only prototype lives in `server/poi_packs` on `codex/poi-data-pipeline`;
+Android implementation must use a separate branch. Local OSM parsing, category
+mapping, normalized FTS4 search, RTree, and unsigned ZIP generation are implemented.
+Local catalogue assembly/signature support is available; no publication, downloader,
+Android integration, or app version change. The versioning skill was reviewed: this
+server-only tool does not change app behavior/build/dependencies, so 0.94 (5) remains.
+
+The real Skåne prototype contains 19,159 POIs in a 2.32 MB download; generation
+took 146.512 seconds with 2.89 GB peak RSS. Full measurements and source-quality
+limitations: [OFFLINE_POI_PROTOTYPE.md](OFFLINE_POI_PROTOTYPE.md). This is a
+local unsigned data candidate, not an Android feature or published data release.
