@@ -177,3 +177,31 @@ Without that optional directory the real-pack test is skipped, while the
 synthetic fixture and regression tests still run. Neither real nor synthetic
 test packs are included in production APK assets. Region screens and a beta
 with user-visible offline behavior are the next integration phase.
+
+## Complete offline flow verification (0.95 / 6, unreleased)
+
+On 2026-10-21, 31 debug JVM tests and all 34 API 35 emulator tests passed,
+with debug lint. The emulator run included the optional real Skåne pack and
+`-Pandroid.testInstrumentationRunnerArguments.offlineLive=true`: a real public
+GitHub download through WorkManager and a launcher UI flow selecting Skåne,
+installing it, switching to POIs and searching `water`. These opt-in tests need
+internet. Without live/real-pack inputs, three optional tests skip.
+
+Additional coverage includes signature rejection and verified-cache retention,
+HTTP bounds/redirects/Range resume, interrupted worker retries and cancellation,
+region hierarchy/hidden selections, category filters, bookmark preservation,
+native-script queries, and location callback duplicate/cancellation cleanup.
+Fresh screenshots confirmed the title-free layout, inline page menu, filter
+sheet and real downloaded results. No physical Karoo installation occurred.
+
+Earlier foundation notes describe the intermediate implementation; network,
+signature and screen integration are now complete. Real Karoo GPS/native-map
+handoff, device performance, API 23 runtime behavior, and background behavior
+under Karoo power management remain unverified. Only one published region is
+available, so multi-region hierarchy/recommendation cases use synthetic fixtures.
+
+Release verification also passed 31 release JVM tests, release lint (warnings),
+and optimized signed `:app:assembleRelease`. The APK signature verified with the
+established certificate SHA-256
+`ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6`.
+The proposed 0.95 Beta 1 is not published or device-tested yet.

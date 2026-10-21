@@ -79,6 +79,7 @@ android {
     }
 
     sourceSets {
+        getByName("test").resources.srcDir("src/main/assets")
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
         providers.gradleProperty("poiCompatibilityAssets").orNull?.let {
             getByName("androidTest").assets.srcDir(it)
@@ -196,6 +197,8 @@ dependencies {
     implementation(libs.androidx.startup)
     implementation(libs.androidx.splashscreen)
     implementation(libs.androidx.datastore)
+    implementation(libs.androidx.work)
+    implementation(libs.google.tink)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.androidx.compose)
@@ -218,6 +221,7 @@ dependencies {
     androidTestImplementation(libs.test.androidx.core)
     androidTestImplementation(libs.test.androidx.junit.ext)
     androidTestImplementation(libs.test.coroutines)
+    androidTestImplementation(libs.test.work)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test.instrumented.extras)
 }

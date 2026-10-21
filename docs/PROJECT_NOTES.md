@@ -86,7 +86,7 @@ The domain directory is not a pure Kotlin module: it imports Android Context,
 platform DI/storage/UI models, and Karoo SDK classes in `OpenExternalMap`.
 This matters when selecting test boundaries.
 
-## Behavior and data flow
+## Photon online-search behavior and data flow
 
 1. Search is submitted explicitly from `SearchWidget`; typing alone does not
    call the service. Input language becomes the HTTP `Accept-Language` header.
@@ -113,45 +113,55 @@ network, location and environment failures.
 
 ## Storage
 
-### Regional offline storage under development
+### Regional offline POIs (0.95 / 6, unreleased)
 
-`platform/offline/RegionPackStore` is the first Android part of the offline
-regions plan. The generator is on separate branch `codex/poi-data-pipeline`
-([PR #2](https://github.com/Roniakia/WaypointsKaroo/pull/2)). No region UI or
-network downloader is wired into this app batch yet; normal UI remains Photon
-search plus bookmarks. Version 0.95 (6) reserves one bump for the cohesive offline
-region batch and is unreleased.
+The generator remains on separate branch `codex/poi-data-pipeline`
+([PR #2](https://github.com/Roniakia/WaypointsKaroo/pull/2)); the Android feature is
+on `codex/offline-poi-regions` ([PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3)).
+The published signed prototype catalogue currently contains only Skåne.
 
-Each installed pack has an independent SQLite snapshot and metadata. A synced
-AtomicFile pointer selects its current snapshot. Installation verifies the
-archive size/SHA-256, exact ZIP entries, extraction limits, metadata, database
-schema/row counts and integrity before switching the pointer. Failed or
-cancelled installs preserve the previous snapshot. Startup restores AtomicFile
-backups and removes uncommitted snapshots. Removal owns only the pack directory;
-Room bookmark schema/history stay unchanged.
+`OfflineHome` replaces the launcher content with compact POIs/Regions screens,
+a menu beside search, first-run invitation, downloaded-first region hierarchy,
+local position/locale recommendations, persistent hidden selections, and
+expandable category filters. Online Photon search remains a secondary action.
+No offline map renderer or routing is included. New UI is English; offline
+straight-line distances currently use metric units. Karoo device validation is
+pending.
 
-One store instance per process must run on an injected IO dispatcher. Searches
-open installed databases read-only, use bound FTS4/category parameters, scan
-matching coordinates, and retain only the requested page prefix while counting
-unique typed OSM identities across regions. Nearest ordering uses great-circle
-distance; name ordering is the fallback without a location. Offset paging has
-no 30-result cutoff. Results are stable while the installed snapshots and query
-remain unchanged. The identity set scales with the number of matches; benchmark
-larger/multiple regions before claiming that worldwide downloads are practical.
+`PoiCatalogueRepository` verifies Ed25519 signatures with pinned-key Tink 1.18.0
+before parsing; a signed bundled seed and atomic cache survive network failures.
+Discovery inspects the latest 100 public GitHub releases for `poi-data-*` assets.
+Catalogue size is capped at 8 MiB. GitHub API limits can delay refreshes; the last
+verified catalogue remains usable. Only repository release URLs and approved
+GitHub redirect hosts are accepted. Packs use direct device internet, independently
+of the Karoo HTTP proxy used for Photon.
 
-Stock API 35 SQLite lacks RTree, so the host-generated optional `poi_geo` RTree
-is unused by Android. It does not prevent FTS4 and regular table reads. Android's
-FTS4 integrity check also requires a writable connection; only staging validation
-uses one. Installed search connections stay read-only. English queries match
-generator-provided transliterations/English aliases/category synonyms. The first
-query normalizer folds Latin accents; native-script query transliteration and
-more complete multilingual aliases remain follow-up work.
+WorkManager 2.10.5 runs connected, uniquely named region downloads with bounded
+retries, progress, cancellation and Range-based partial-file recovery. Matching
+revision/hash downloads and older catalogue dates are skipped. Explicit removal
+cancels the install generation before deleting data. No periodic network polling
+is added. Position refresh runs once per minute only while the screen is started.
 
-PackDescriptor is **not** a trust anchor. The upcoming network layer must verify
-the catalogue signature against the pinned public key before constructing it.
-Never expose direct installation of an unverified remote descriptor. Background
-downloads, signature verification, recommendations, compact Regions/POIs screens,
-filters, first-run invitation and bookmark/native-map integration remain pending.
+`RegionPackStore` verifies size/SHA-256, exact ZIP entries, extraction limits,
+metadata, schema, row counts and integrity before switching a synced AtomicFile
+snapshot pointer. Failure/cancellation preserves the old snapshot. Startup
+restores pointer backups and removes orphan snapshots. A local hash receipt
+supports unchanged checks. Store calls run on injected IO dispatchers.
+
+Search opens snapshots read-only, binds FTS4/category queries, deduplicates typed
+OSM identities across regions and retains the requested page prefix while
+counting matches. Nearest ordering uses great-circle distance with name fallback.
+There is no 30-result cutoff. English transliterations/category aliases are
+provided by the generator; native-script tokens scan original names/tags.
+Full multilingual transliteration is limited by the generated aliases. Match
+identity memory and native-script scans should be benchmarked on larger packs.
+
+Stock API 35 SQLite lacks RTree: the optional desktop `poi_geo` table is ignored.
+FTS4 integrity validation requires a writable staging connection; installed
+searches remain read-only. New bookmark IDs include OSM object type. Legacy
+Photon numeric IDs are preserved without guessing types, so cross-source legacy
+duplicates are possible. Pack removal never deletes Room bookmarks. No Room
+schema or migration changes are required.
 
 Room database `app_database`, version 2, table `waypoints`. Autogenerated local
 ID, unique `serverId`, server type (currently PHOTON), name, address fields,
@@ -207,12 +217,11 @@ verified device failures or changes made during this analysis.
 - Service connection wait has no timeout. The units request can wait indefinitely;
   geo-enabled ViewModel processing asks for units even for an empty ready list.
   A stock emulator may therefore stall state updates without Karoo services.
-- Location/profile consumers are removed after normal suspension returns, but
-  lack cancellation cleanup. Repeated events can try to resume a continuation
-  more than once. HTTP consumer cleanup also needs timeout/cancellation coverage.
-- GPS timeout wraps connection plus location work, but the catch is inside
-  `getLocation`; connection timeout can escape its fallback path. Returning a
-  fallback from an already cancelled timeout context also needs verification.
+- Profile consumer cancellation and HTTP consumer timeout/cancellation cleanup
+  still need focused coverage. GPS consumers now clean up with callbackFlow.
+- GPS now times out connection plus location work, returns fallback outside the
+  timeout context, and cleans up callback consumers on cancellation. Duplicate
+  callbacks are covered by focused JVM tests.
 - Service reference counting increments/decrements under a mutex, while the
   connection/disconnection decisions occur outside it; concurrency deserves tests.
 - Photon provider catches broad Exception, including ordinary coroutine

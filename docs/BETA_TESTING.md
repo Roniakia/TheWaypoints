@@ -1,3 +1,30 @@
+# 0.95 Beta 1 proposal — not yet published
+
+Planned candidate: `v0.95-beta.1`, Android version 0.95 (code 6), signed with the
+existing application identity. Publication and physical installation await the
+user's acceptance of this beta proposal. The source commit, APK hash and signing
+certificate will be recorded with the candidate before publication.
+
+1. Upgrade the existing independent Waypoints app; keep existing bookmarks.
+2. On first launch, search `skane` in Regions, select Skåne and use Update selected.
+   Check progress, cancellation/retry, and downloaded-first placement on reopening.
+3. Switch to POIs using the menu beside search. Disable connectivity, search
+   `water` or a place name, try filters and scrolling beyond 30 results.
+4. With GPS available, check nearest ordering; without GPS, check name fallback.
+   Test the small-screen keyboard and filter sheet on the actual device.
+5. Bookmark a downloaded POI, restart, remove Skåne, and confirm the saved POI is
+   still available under the star button. Re-download and check update behavior.
+6. Tap a POI to open Karoo's map. Try Search online with connectivity restored.
+7. Report model/KOS, candidate tag, failures and explicit acceptance when satisfied.
+
+Known limits: one published Skåne prototype (19,159 POIs), one invalid source-wide
+OSM relation omitted; new UI English, offline distances metric; no offline map
+renderer or routing. API 23 runtime and Karoo background/power-management behavior
+have not been validated. Multi-region UI cases use synthetic emulator fixtures.
+Never uninstall the existing app merely to work around an upgrade error.
+
+---
+
 # 0.94 Beta 1 device testing
 
 **Accepted and promoted on 2026-10-21.** The user reported that it works great

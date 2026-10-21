@@ -21,7 +21,7 @@ data class PackDescriptor(
     }
 }
 
-data class InstalledRegion(val id: String, val name: String, val revision: String, val poiCount: Long)
+data class InstalledRegion(val id: String, val name: String, val revision: String, val poiCount: Long, val sha256: String? = null, val dataDate: String? = null)
 
 data class PoiPosition(val latitude: Double, val longitude: Double) {
     init {
@@ -65,12 +65,18 @@ data class PoiPage(val items: List<OfflinePoi>, val total: Int, val hasMore: Boo
 object PoiSearchText {
     private val marks = Regex("\\p{M}+")
     private val separators = Regex("[^a-z0-9]+")
-    fun normalize(value: String): String {
+    private val wordSeparators = Regex("[^\\p{L}\\p{N}]+")
+    private fun folded(value: String): String {
         val folded = value.lowercase(Locale.ROOT).replace("ß", "ss").replace("æ", "ae")
             .replace("ø", "o").replace("ł", "l").replace("œ", "oe").replace("đ", "d")
         return Normalizer.normalize(folded, Normalizer.Form.NFKD)
-            .replace(marks, "").replace(separators, " ").trim()
+            .replace(marks, "")
     }
+    fun normalize(value: String): String = folded(value).replace(separators, " ").trim()
+    fun nativeWords(value: String): List<String> = folded(value).split(wordSeparators)
+        .filter { word -> word.any { it.code > 127 && it.isLetterOrDigit() } }
+    fun matchesNative(value: String, words: List<String>): Boolean = words.isEmpty() || folded(value).let { text -> words.all { it in text } }
+    fun sortKey(value: String): String = normalize(value).ifBlank { folded(value) }
 
     // Only normalized tokens enter FTS syntax; punctuation/operators never execute.
     fun ftsQuery(value: String): String = normalize(value).split(' ').filter(String::isNotEmpty)

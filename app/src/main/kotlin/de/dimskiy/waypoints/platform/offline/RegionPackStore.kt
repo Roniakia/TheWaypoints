@@ -29,7 +29,7 @@ class RegionPackStore(private val root: File) {
         snapshots().map { (id, folder) ->
             val metadata = metadata(folder)
             InstalledRegion(id, metadata.get("name").asString, metadata.get("revision").asString,
-                metadata.get("poi_count").asLong)
+                metadata.get("poi_count").asLong, File(folder, "archive.sha256").takeIf { it.isFile }?.readText(), metadata.get("data_date")?.asString)
         }.sortedBy { PoiSearchText.normalize(it.name) }
     }
 
@@ -79,6 +79,9 @@ class RegionPackStore(private val root: File) {
             require(seen == limits.keys) { "Incomplete pack" }
             validate(folder, expected)
             checkCancelled()
+            FileOutputStream(File(folder, "archive.sha256")).use {
+                it.write(expected.sha256.toByteArray(Charsets.US_ASCII)); it.fd.sync()
+            }
             val pointer = AtomicFile(File(root, "${expected.id}.current"))
             val stream = pointer.startWrite()
             try {
@@ -105,8 +108,9 @@ class RegionPackStore(private val root: File) {
     fun search(request: PoiSearch, checkCancelled: () -> Unit = {}): PoiPage = synchronized(lock) {
         if (request.categories?.isEmpty() == true) return@synchronized PoiPage(emptyList(), 0, false)
         val query = PoiSearchText.ftsQuery(request.text)
+        val native = PoiSearchText.nativeWords(request.text)
         // Nonblank input which cannot be represented must not accidentally return every POI.
-        if (request.text.isNotBlank() && query.isEmpty()) return@synchronized PoiPage(emptyList(), 0, false)
+        if (request.text.isNotBlank() && query.isEmpty() && native.isEmpty()) return@synchronized PoiPage(emptyList(), 0, false)
         val comparator = if (request.sort == PoiSort.NEAREST && request.position != null) {
             compareBy<RankedPoi> { it.poi.distanceMetres }.thenBy { it.nameKey }.thenBy { it.poi.osmId }
         } else compareBy<RankedPoi> { it.nameKey }.thenBy { it.poi.osmId }
@@ -132,12 +136,14 @@ class RegionPackStore(private val root: File) {
                     while (rows.moveToNext()) {
                         checkCancelled()
                         val id = rows.getString(0)
+                        if (native.isNotEmpty() && !PoiSearchText.matchesNative("${rows.getString(1)} ${rows.getString(4)}", native)) continue
                         if (!identities.add(id)) continue
                         val point = PoiPosition(rows.getDouble(2), rows.getDouble(3))
                         val poi = OfflinePoi(id, rows.getString(1), point,
                             rows.getString(5)?.split(',')?.toSet().orEmpty(), rows.getString(4),
                             request.position?.let { distance(it, point) })
-                        best.add(RankedPoi(poi, PoiSearchText.normalize(poi.name)))
+                        val displayName = poi.name.ifBlank { poi.categories.firstOrNull()?.let(PoiTypes::label) ?: "POI" }
+                        best.add(RankedPoi(poi, PoiSearchText.sortKey(displayName)))
                         if (best.size > keep) best.poll()
                     }
                 }

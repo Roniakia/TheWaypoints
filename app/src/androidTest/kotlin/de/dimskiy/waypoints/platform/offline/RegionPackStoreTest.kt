@@ -28,6 +28,8 @@ class RegionPackStoreTest {
         assertEquals("Skåne test", RegionPackStore(root).installed().single().name)
         assertEquals("node/1", store.search(PoiSearch("kyiv")).items.single().osmId)
         assertEquals("way/1", store.search(PoiSearch("tokyo")).items.single().osmId)
+        assertEquals("way/1", store.search(PoiSearch("東京")).items.single().osmId)
+        assertEquals("node/1", store.search(PoiSearch("київ coffee")).items.single().osmId)
         assertEquals("Київ", store.search(PoiSearch("coffee", categories = setOf("bicycle.pump"))).items.single().name)
         assertEquals(64, store.search(PoiSearch("water")).total)
         assertEquals(64, store.search(PoiSearch("skane")).total)

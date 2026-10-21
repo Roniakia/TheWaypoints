@@ -37,7 +37,9 @@ or configuration file is required to build the app.
 
 Online searches send the query and language to Photon through Karoo's HTTP
 service. Nearby searches also send location coordinates to bias the results.
-Bookmarks and the cached search location are stored locally.
+Bookmarks and the cached search location are stored locally. In development 0.95,
+regional packs and signed catalogue updates download directly from GitHub. Region
+recommendations use position or locale locally; no analytics is added.
 
 ## Compatibility
 
@@ -117,15 +119,22 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ### v0.95 — unreleased
 
-- Add the Android storage foundation for regional offline POI packs: verified
-  archive installation, atomic replacement, recovery after interruption, and
-  removal independent of bookmarks.
-- Add local category/name search, English aliases for non-Latin POI names,
-  accent-insensitive Latin queries, nearest/name ordering, overlapping-region
-  deduplication, and pagination beyond 30 results.
-- This foundation is not connected to the app screens yet. Region selection,
-  signed catalogue downloads, and background updates are still in development.
-  Existing online search and bookmarks remain the visible app behavior.
+- Add compact POIs and Regions screens, with the page menu beside search and a
+  first-run region download invitation.
+- Browse searchable region hierarchies, downloaded regions first and local
+  recommendations next. Update selected regions (including missing downloads),
+  update all downloaded regions, cancel downloads, or remove a region.
+- Search downloaded POIs by name, English transliteration, category and synonyms;
+  preserve native-script names and queries. Use expandable type filters,
+  nearest/name ordering, and pagination beyond 30 results.
+- Verify signed catalogues and pack checksums; download in the background with
+  resume/retry and atomic replacement. Bookmarks survive region removal.
+- Preserve Photon online search and native Karoo map handoff. Fix the wasted
+  platform title bar and location callback cancellation/duplicate events.
+- Add WorkManager 2.10.5 and Tink 1.18.0 without changing Compose/Lifecycle pins.
+- Initial catalogue offers the Skåne prototype only. New screens are English and
+  offline distances are metric; Karoo device testing and API 23 runtime testing
+  remain pending. This does not add offline maps or routing.
 
 ### v0.94 — stable, 2026-10-21
 
