@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.95`, code `6` in `gradle.properties`; stable is 0.94 (5) |
+| Development version | `0.95`, code `7` in `gradle.properties`; stable is 0.94 (5) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -113,7 +113,7 @@ network, location and environment failures.
 
 ## Storage
 
-### Regional offline POIs (0.95 / 6, unreleased)
+### Regional offline POIs (0.95, Beta 1 code 6 / Beta 2 code 7)
 
 The generator remains on separate branch `codex/poi-data-pipeline`
 ([PR #2](https://github.com/Roniakia/WaypointsKaroo/pull/2)); the Android feature is
@@ -250,3 +250,15 @@ internal Kotlin namespace is retained to avoid an unrelated source rename.
 The app installs alongside upstream and starts with independent storage.
 Update metadata points to this repository. A dedicated private signing key is
 kept outside the repository; preserve a private backup for future updates.
+
+## Beta 2 update metadata correction
+
+`APP_RELEASE_TAG=v0.95-beta.2` binds the APK's MANIFEST_URL and generated Karoo
+manifest asset URLs to the same immutable release. Candidate APK filenames are
+versioned (`waypoints-0.95-beta.2.apk`). The generator tracks these values as
+task inputs. Without a release tag the rolling stable /latest/download behavior
+is retained; publishing a tagged candidate requires its matching tag/property.
+Beta 1 incorrectly embedded the stable update URL. The user's device showed
+0.95 briefly and then 0.94; metadata refresh is the suspected mechanism, not a
+verified trace of Karoo internals. This build removes that mismatch. It does not
+change APK identity/signing or Room storage. Stable 0.94 remains unchanged.

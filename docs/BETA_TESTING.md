@@ -1,3 +1,18 @@
+# 0.95 Beta 2 installation fix
+
+Candidate `v0.95-beta.2`: app version 0.95, code 7. Share the actual versioned
+APK link to Hammerhead Companion, not the GitHub page or a JSON manifest:
+https://github.com/Roniakia/WaypointsKaroo/releases/download/v0.95-beta.2/waypoints-0.95-beta.2.apk
+
+This candidate embeds its own update manifest URL. Confirm Karoo continues to
+show 0.95 (7) through download and installation, then opens Regions with the
+menu beside search. Keep the existing app installed to preserve bookmarks.
+Record device/KOS and any remaining installer issue. Native Karoo installer
+behavior remains unverified until the user tests it. Continue the offline-flow
+steps below after installation. Beta 1 notes are retained as history.
+
+---
+
 # 0.95 Beta 1 proposal — not yet published
 
 Planned candidate: `v0.95-beta.1`, Android version 0.95 (code 6), signed with the

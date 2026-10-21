@@ -117,7 +117,13 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ## Release notes
 
-### v0.95 — unreleased
+### v0.95 — beta testing
+
+Beta 2 (`v0.95-beta.2`, code 7) fixes the beta's embedded Karoo update URL:
+it now resolves the candidate's own manifest rather than stable 0.94. Generated
+metadata targets the versioned `waypoints-0.95-beta.2.apk` filename. Beta 1 was
+code 6; the app version remains 0.95. The installation fix still needs Karoo
+confirmation. No bookmark/database migration is required.
 
 - Add compact POIs and Regions screens, with the page menu beside search and a
   first-run region download invitation.

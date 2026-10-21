@@ -205,3 +205,21 @@ and optimized signed `:app:assembleRelease`. The APK signature verified with the
 established certificate SHA-256
 `ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6`.
 The proposed 0.95 Beta 1 is not published or device-tested yet.
+
+## Beta 2 packaging regression check
+
+Inspect the signed APK itself, not only the source manifest: `aapt dump xmltree`
+must show MANIFEST_URL ending `/v0.95-beta.2/manifest-karoo.json`; `aapt dump
+badging` must report 0.95/code 7. Generated `manifest-karoo.json` must report
+the same version/code and target `/v0.95-beta.2/waypoints-0.95-beta.2.apk`.
+Verify the signing certificate and uploaded bytes. A stock emulator can check
+launcher/region drawer but cannot reproduce the Karoo Companion installer.
+
+Beta 2 verification on 2026-10-21 passed 31 debug and 31 release JVM tests,
+release lint (warnings), and optimized signed release assembly. The packaged
+APK audit confirmed 0.95/code 7, the candidate-specific MANIFEST_URL, matching
+generated APK/icon URLs, and the established signing certificate. Installing
+that exact release APK over Beta 1 on the API 35 emulator succeeded; launcher
+inspection found Search regions and Choose page. The earlier 34-test offline
+emulator suite belongs to Beta 1; it was not rerun for this metadata-only fix.
+No physical Karoo was installed; Companion installer behavior remains pending.
