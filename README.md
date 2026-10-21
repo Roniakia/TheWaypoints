@@ -13,7 +13,7 @@ This project is evolving into a new app, starting from
 [dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo). Credit to the
 original author for the idea and initial codebase; further development follows
 this project's own direction.
-Version **0.94 (code 5)** is stable. Download the APK from the
+Version **0.95 (code 7)** is stable. Download the APK from the
 [latest release](https://github.com/Roniakia/WaypointsKaroo/releases/latest).
 It is the identical APK accepted during beta testing; existing beta users do not
 need to reinstall.
@@ -117,13 +117,16 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ## Release notes
 
-### v0.95 — beta testing
+### v0.95 — stable, 2026-10-21
+
+Promoted the accepted `v0.95-beta.2` without rebuilding. The tag, versioned APK
+filename, signing key, app version/code and source commit are unchanged.
+Known UI roughness was accepted for this pre-1.0 release.
 
 Beta 2 (`v0.95-beta.2`, code 7) fixes the beta's embedded Karoo update URL:
 it now resolves the candidate's own manifest rather than stable 0.94. Generated
 metadata targets the versioned `waypoints-0.95-beta.2.apk` filename. Beta 1 was
-code 6; the app version remains 0.95. The installation fix still needs Karoo
-confirmation. No bookmark/database migration is required.
+code 6; the app version remains 0.95. The user confirmed it works on their Karoo and authorized stable release. No bookmark/database migration is required.
 
 - Add compact POIs and Regions screens, with the page menu beside search and a
   first-run region download invitation.

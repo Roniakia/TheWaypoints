@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.95`, code `7` in `gradle.properties`; stable is 0.94 (5) |
+| Development version | `0.95`, code `7` in `gradle.properties`; stable is 0.95 (7) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -262,3 +262,16 @@ Beta 1 incorrectly embedded the stable update URL. The user's device showed
 0.95 briefly and then 0.94; metadata refresh is the suspected mechanism, not a
 verified trace of Karoo internals. This build removes that mismatch. It does not
 change APK identity/signing or Room storage. Stable 0.94 remains unchanged.
+
+## Stable 0.95 acceptance (2026-10-21)
+
+The user reported Beta 2 works on their Karoo and explicitly authorized release,
+accepting remaining UI roughness for the pre-1.0 app. Model/KOS were not given.
+Promoted the existing release to stable/latest, retaining tag `v0.95-beta.2`,
+source `45018deb21988b2e2b41e18be7472351bb2bbb56`, version 0.95/code 7,
+and identical APK SHA-256
+`0253fb271115a6d0e6385be87aedb6687e9039a396c02dd66de98c220a676fce`.
+No rebuild, asset replacement or tag move occurred. Build-time records attached
+to the release retain their historical pending status; release metadata and this
+record capture subsequent user acceptance. No new device compatibility claims
+or comprehensive coverage of all test steps are inferred from the acceptance.

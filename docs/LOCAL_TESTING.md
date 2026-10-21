@@ -1,7 +1,7 @@
 # Local testing before Karoo hardware
 
 Status: 2026-10-21. JDK 17 and a local API 35 emulator are available. Karoo
-service simulation is not implemented. Current stable version: 0.94 (5).
+service simulation is not implemented. Current stable version: 0.95 (7).
 
 ## Build setup
 
@@ -223,3 +223,16 @@ that exact release APK over Beta 1 on the API 35 emulator succeeded; launcher
 inspection found Search regions and Choose page. The earlier 34-test offline
 emulator suite belongs to Beta 1; it was not rerun for this metadata-only fix.
 No physical Karoo was installed; Companion installer behavior remains pending.
+
+## Stable 0.95 acceptance (2026-10-21)
+
+The user reported Beta 2 works on their Karoo and explicitly authorized release,
+accepting remaining UI roughness for the pre-1.0 app. Model/KOS were not given.
+Promoted the existing release to stable/latest, retaining tag `v0.95-beta.2`,
+source `45018deb21988b2e2b41e18be7472351bb2bbb56`, version 0.95/code 7,
+and identical APK SHA-256
+`0253fb271115a6d0e6385be87aedb6687e9039a396c02dd66de98c220a676fce`.
+No rebuild, asset replacement or tag move occurred. Build-time records attached
+to the release retain their historical pending status; release metadata and this
+record capture subsequent user acceptance. No new device compatibility claims
+or comprehensive coverage of all test steps are inferred from the acceptance.

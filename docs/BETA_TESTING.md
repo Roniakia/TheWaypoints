@@ -1,3 +1,13 @@
+# 0.95 Beta 2 — accepted and promoted to stable
+
+On 2026-10-21 the user confirmed this candidate works on their Karoo and
+authorized stable release, accepting current UI roughness. Stable 0.95 uses the
+identical Beta 2 APK, tag and source commit; reinstalling is unnecessary for
+Beta 2 users. Device model/KOS were not recorded. The steps below are retained
+as the original testing record.
+
+---
+
 # 0.95 Beta 2 installation fix
 
 Candidate `v0.95-beta.2`: app version 0.95, code 7. Share the actual versioned
