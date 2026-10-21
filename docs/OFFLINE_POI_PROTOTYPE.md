@@ -16,8 +16,9 @@ This is a server/data feasibility result; the Android feature is not implemented
   CPU or installed RAM specification is asserted.
 
 Commands and environment setup are in `server/poi_packs/README.md`. Generated packs,
-source extracts and signing keys are excluded from Git. No production signing key,
-tag, release, upload, schedule or physical-device installation was created.
+source extracts and private signing keys are excluded from Git. Publication and
+subsequent Android compatibility checks are recorded below. No schedule or
+physical-device installation was created.
 
 ## Final candidate
 
@@ -93,14 +94,30 @@ English and limited Swedish. Complete supported-language aliases, minimum-client
 compatibility, Karoo SQLite checks, shared country-pass optimization and secure
 app installation remain future work. No production distribution is ready yet.
 
-## Verification and next milestone
+## Verification, publication and next milestone
 
 Ten Python tests pass. The existing Android unit-test Gradle target succeeds using
 cached outputs; no Android implementation changed. `git diff --check` passes.
 An unsigned local catalogue was assembled successfully against the final pack.
+These describe the original server measurement; subsequent results follow.
 
-The measurements support proceeding with the pack format and Android read-only
-import/search prototype on a separate app branch. First verify FTS4/RTree support
-on the emulator/Karoo SQLite baseline, then implement bookmark migration,
-download lifecycle and the agreed compact interface. Review category defaults and
-source quality before expanding beyond Sweden or publishing anything.
+The [data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2)
+was published on 2026-10-21 from generator commit
+`736150d73837247909d34f35e85cf0943f3f70ef`. Seven assets were downloaded back from
+their public URLs; all GitHub digests and SHA256SUMS entries matched. The catalogue
+signature verifies against the tracked Ed25519 public key. App 0.94 remains the
+latest stable release and its manifest still reports versionCode 5.
+
+Separate Android foundation commit `ae78419a9af5ee325e59f6d3de20716f1d9917ae`
+([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3)) imports this
+pack on API 35. Its 17 JVM tests, 25 emulator tests and lint pass. Android SQLite
+lacks RTree, so regular coordinates and FTS4 are used instead of the optional host
+RTree. FTS4 integrity checking needs a writable staging connection; installed
+search connections remain read-only. Single illustrative emulator measurements:
+first alphabetic page across all 19,159 POIs 318 ms; nearest-first `water` page
+4 ms, 137 matches. These are not Karoo performance guarantees.
+
+Next: signed catalogue verification on API 23+, background download lifecycle,
+bookmark integration, recommendations and the agreed compact interface. Review
+category defaults, larger/multiple-region performance and source quality before
+expanding beyond Sweden. The stable app cannot import these packs yet.

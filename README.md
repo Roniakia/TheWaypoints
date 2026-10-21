@@ -123,7 +123,7 @@ The stable 0.94 app does not yet import these packs; Android integration is next
 
 ## Release notes
 
-### POI data 2026-10-prototype.2 — prerelease candidate
+### POI data 2026-10-prototype.2 — prerelease, 2026-10-21
 
 - Add reusable OSM extraction, administrative boundaries, category mapping,
   transliteration/alias search, spatial indexing, and immutable regional SQLite packs.
@@ -132,6 +132,13 @@ The stable 0.94 app does not yet import these packs; Android integration is next
 - Add generation/download validation and ten server tests. One invalid source-wide
   swimming-area geometry is documented for review.
 - Data-only prototype: no APK, no app version change, and no current app import support.
+- [Download the data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2).
+  All seven public assets, their checksums and the pinned-key catalogue signature
+  were verified after publication. App 0.94 remains the latest stable release.
+- The separate Android foundation ([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3))
+  reads the real pack on API 35; 17 JVM tests, 25 emulator tests and lint pass.
+  Android uses regular coordinates/FTS4 because stock SQLite lacks RTree.
+  Download/UI integration and real Karoo performance remain unverified.
 
 
 ### v0.94 — stable, 2026-10-21
