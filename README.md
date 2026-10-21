@@ -23,6 +23,11 @@ You need to sideload the latest Waypoints' APK using the guide from Hammerhead:
    Then use this command to install the APK:```adb install <PATH_TO_APK>```
 
 ## Release notes
+v0.94 (unreleased)
+* Remove Firebase Analytics, Crashlytics, and all usage reporting.
+* Update karoo-ext to 1.1.9, Android Gradle Plugin to 8.9.2, Room to 2.8.5, and DataStore to 1.2.1.
+* Add local build and regression coverage for search focus, settings persistence, and pin-drop serialization.
+
 v0.84
 Fix imperial/metric units detection.
 Fix address has no house number in search result & bookmarks.
