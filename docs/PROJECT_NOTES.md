@@ -250,3 +250,27 @@ internal Kotlin namespace is retained to avoid an unrelated source rename.
 The app installs alongside upstream and starts with independent storage.
 Update metadata points to this repository. A dedicated private signing key is
 kept outside the repository; preserve a private backup for future updates.
+
+## Server prototype and early Android milestones (historical)
+
+Agreed scope is recorded in [OFFLINE_POI_PLAN.md](OFFLINE_POI_PLAN.md).
+Server-only prototype lives in `server/poi_packs` on `codex/poi-data-pipeline`;
+Android implementation must use a separate branch. Local OSM parsing, category
+mapping, normalized FTS4 search, optional host RTree, and immutable ZIP generation
+are implemented. The signed data prerelease `poi-data-2026-10-prototype.2` is
+published with seven verified assets. The separate Ed25519 data public key is
+tracked at `server/poi_packs/config/poi-data-public.pem`; its PEM SHA-256 is
+`43294ee8ec4b93e2b219a03cca29d23bab5830aa16d0ae39da8468555f05c28f`.
+Private key material stays outside Git. At that publication milestone the app
+update manifest was 0.94 (5).
+
+The real Skåne prototype contains 19,159 POIs in a 2.32 MB download; generation
+took 146.512 seconds with 2.89 GB peak RSS. Full measurements and source-quality
+limitations: [OFFLINE_POI_PROTOTYPE.md](OFFLINE_POI_PROTOTYPE.md).
+
+Android storage work is separate on `codex/offline-poi-regions`, draft PR #3,
+commit `ae78419a9af5ee325e59f6d3de20716f1d9917ae`, reserving unreleased 0.95 (6).
+Its real-pack compatibility and 17 JVM/25 API 35 tests plus lint pass. Stock Android
+lacks RTree; the client reads ordinary coordinates/FTS4. Writable integrity checks
+run only on staging copies. At that foundation milestone, signature/download lifecycle and compact screens
+were pending. The later Android implementation and checks are described above.

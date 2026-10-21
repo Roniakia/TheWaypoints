@@ -115,6 +115,15 @@ requests to `main` and include meaningful changelogs. The manually dispatched
 publishing workflows are not build verification shortcuts: both publish
 artifacts, and the release workflow also commits and pushes version changes.
 
+## Offline POI data development
+
+The reusable [regional pack generator](server/poi_packs/README.md) runs on a laptop
+or server. The first Skåne candidate contains 19,159 POIs in a 2.32 MB download.
+See the [measurements and limitations](docs/OFFLINE_POI_PROTOTYPE.md).
+Data releases use separate `poi-data-*` tags and never replace the latest app release.
+The Android integration is implemented in this PR; its verification is recorded
+in the local testing guide.
+
 ## Release notes
 
 ### v0.95 — unreleased
@@ -135,6 +144,25 @@ artifacts, and the release workflow also commits and pushes version changes.
 - Initial catalogue offers the Skåne prototype only. New screens are English and
   offline distances are metric; Karoo device testing and API 23 runtime testing
   remain pending. This does not add offline maps or routing.
+
+### POI data 2026-10-prototype.2 — prerelease, 2026-10-21
+
+- Add reusable OSM extraction, administrative boundaries, category mapping,
+  transliteration/alias search, spatial indexing, and immutable regional SQLite packs.
+- Provide the first Skåne pack, source/pack checksums, attribution, and a signed
+  catalogue with a separate Ed25519 data-signing identity.
+- Add generation/download validation and ten server tests. One invalid source-wide
+  swimming-area geometry is documented for review.
+- Data-only prototype: no APK or app version change was included in that release.
+- [Download the data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2).
+  All seven public assets, their checksums and the pinned-key catalogue signature
+  were verified after publication. App 0.94 remains the latest stable release.
+- The separate Android foundation ([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3))
+  reads the real pack on API 35; 17 JVM tests, 25 emulator tests and lint pass.
+  Android uses regular coordinates/FTS4 because stock SQLite lacks RTree.
+  Those were intermediate foundation results; later Android download/UI checks
+  are recorded in [LOCAL_TESTING.md](docs/LOCAL_TESTING.md).
+
 
 ### v0.94 — stable, 2026-10-21
 
