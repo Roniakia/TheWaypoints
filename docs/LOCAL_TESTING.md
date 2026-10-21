@@ -1,7 +1,7 @@
 # Local testing before Karoo hardware
 
 Status: 2026-10-21. JDK 17 and a local API 35 emulator are available. Karoo
-service simulation is not implemented. Current stable version: 0.94 (5).
+service simulation is not implemented. Current stable version: 0.95 (7).
 
 ## Build setup
 
@@ -205,6 +205,37 @@ and optimized signed `:app:assembleRelease`. The APK signature verified with the
 established certificate SHA-256
 `ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6`.
 The proposed 0.95 Beta 1 is not published or device-tested yet.
+
+## Beta 2 packaging regression check
+
+Inspect the signed APK itself, not only the source manifest: `aapt dump xmltree`
+must show MANIFEST_URL ending `/v0.95-beta.2/manifest-karoo.json`; `aapt dump
+badging` must report 0.95/code 7. Generated `manifest-karoo.json` must report
+the same version/code and target `/v0.95-beta.2/waypoints-0.95-beta.2.apk`.
+Verify the signing certificate and uploaded bytes. A stock emulator can check
+launcher/region drawer but cannot reproduce the Karoo Companion installer.
+
+Beta 2 verification on 2026-10-21 passed 31 debug and 31 release JVM tests,
+release lint (warnings), and optimized signed release assembly. The packaged
+APK audit confirmed 0.95/code 7, the candidate-specific MANIFEST_URL, matching
+generated APK/icon URLs, and the established signing certificate. Installing
+that exact release APK over Beta 1 on the API 35 emulator succeeded; launcher
+inspection found Search regions and Choose page. The earlier 34-test offline
+emulator suite belongs to Beta 1; it was not rerun for this metadata-only fix.
+No physical Karoo was installed; Companion installer behavior remains pending.
+
+## Stable 0.95 acceptance (2026-10-21)
+
+The user reported Beta 2 works on their Karoo and explicitly authorized release,
+accepting remaining UI roughness for the pre-1.0 app. Model/KOS were not given.
+Promoted the existing release to stable/latest, retaining tag `v0.95-beta.2`,
+source `45018deb21988b2e2b41e18be7472351bb2bbb56`, version 0.95/code 7,
+and identical APK SHA-256
+`0253fb271115a6d0e6385be87aedb6687e9039a396c02dd66de98c220a676fce`.
+No rebuild, asset replacement or tag move occurred. Build-time records attached
+to the release retain their historical pending status; release metadata and this
+record capture subsequent user acceptance. No new device compatibility claims
+or comprehensive coverage of all test steps are inferred from the acceptance.
 
 ## Regional POI server prototype
 

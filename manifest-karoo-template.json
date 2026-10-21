@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.95: Download signed regional POI packs; search offline by name or category; expandable filters, region updates and preserved bookmarks. Initial Skåne prototype; no offline maps. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.95 Beta 2: Fix candidate update URL and versioned APK links to avoid stable 0.94 metadata; download signed regional POI packs; search offline by name or category; expandable filters, region updates and preserved bookmarks. Initial Skåne prototype; no offline maps. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

@@ -10,6 +10,18 @@ plugins {
 }
 
 val localBuild = providers.gradleProperty("localBuild").map(String::toBoolean).getOrElse(false)
+// A candidate must never resolve its update metadata through GitHub's stable /latest/ alias.
+val releaseTag = providers.gradleProperty("APP_RELEASE_TAG").orNull?.takeIf { it.isNotBlank() }
+require(releaseTag == null || releaseTag.matches(Regex("v[0-9]+\\.[0-9]+(?:-beta\\.[0-9]+)?"))) {
+    "APP_RELEASE_TAG must be a versioned release tag"
+}
+require(releaseTag == null || releaseTag.removePrefix("v").substringBefore("-beta.") ==
+    providers.gradleProperty("APP_VERSION_NAME").get()) {
+    "APP_RELEASE_TAG must match APP_VERSION_NAME"
+}
+val releaseAssetBase = "https://github.com/Roniakia/WaypointsKaroo/releases/" +
+    (releaseTag?.let { "download/$it" } ?: "latest/download")
+val releaseApkName = releaseTag?.let { "waypoints-${it.removePrefix("v")}.apk" } ?: "app-release.apk"
 
 android {
     namespace = "de.dimskiy.waypoints"
@@ -21,6 +33,7 @@ android {
         targetSdk = 35
         versionCode = project.properties["APP_VERSION_CODE"].toString().toInt()
         versionName = project.properties["APP_VERSION_NAME"].toString()
+        manifestPlaceholders["karooManifestUrl"] = "$releaseAssetBase/manifest-karoo.json"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -120,6 +133,8 @@ afterEvaluate {
         inputs.property("applicationId", project.properties["APPLICATION_ID"].toString())
         inputs.property("versionCode", project.properties["APP_VERSION_CODE"].toString())
         inputs.property("versionName", project.properties["APP_VERSION_NAME"].toString())
+        inputs.property("releaseAssetBase", releaseAssetBase)
+        inputs.property("releaseApkName", releaseApkName)
         outputs.file(outputFile)
 
         val getSectionText: (String) -> String = { sectionName ->
@@ -153,6 +168,8 @@ afterEvaluate {
             jsonObject.addProperty("latestVersion", versionName)
             jsonObject.addProperty("packageName", packageName)
             jsonObject.addProperty("description", description)
+            jsonObject.addProperty("iconUrl", "$releaseAssetBase/app_icon.webp")
+            jsonObject.addProperty("latestApkUrl", "$releaseAssetBase/$releaseApkName")
 
             outputFile.get().asFile.parentFile.mkdirs()
             outputFile.get().asFile.writeText(jsonObject.toString())
