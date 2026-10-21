@@ -1,7 +1,7 @@
 # Local testing before Karoo hardware
 
 Status: 2026-10-21. JDK 17 and a local API 35 emulator are available. Karoo
-service simulation is not implemented. Current unreleased version: 0.94 (5).
+service simulation is not implemented. Current stable version: 0.94 (5).
 
 ## Build setup
 
@@ -121,3 +121,11 @@ its launchable activity resolves correctly. The source Kotlin namespace remains
 internal and unchanged. The final downloadable asset is built from the tagged
 commit; its checksum, source SHA and certificate fingerprint are in the release
 assets. See [beta device-test instructions](BETA_TESTING.md).
+
+## Stable promotion acceptance
+
+On 2026-10-21 the user accepted Beta 1 after real Karoo testing and authorized
+publishing and merging. The existing GitHub prerelease was promoted to stable
+0.94 with the same tag, source commit, APK and other assets. No build or test
+rerun was needed for promotion; subsequent changes record acceptance in docs only.
+The model and KOS version were not specified.

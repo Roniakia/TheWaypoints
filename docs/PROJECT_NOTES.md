@@ -58,7 +58,13 @@ and Karoo service integration are the app's functional external boundaries; no
 telemetry replacement was introduced. The local mode is not a service simulator.
 
 Version metadata is maintained with the personal `waypoints-versioning` skill.
-This unreleased batch is 0.94 (5), including the prior dependency/build updates.
+Current stable version is 0.94 (5), including the dependency/build updates.
+The user accepted Beta 1 on a real Karoo and authorized stable promotion on
+2026-10-21. The release retains tag `v0.94-beta.1`, commit
+`620218cae8781499108cf1b241f39aad54bfeb1c`, and the identical signed APK.
+APK SHA-256: `fedac57e7149e0c11edd7a05ba919712d2e18449691f3dc8bc2d39f8ae83f968`.
+Release metadata records acceptance; build-info.json preserves its original
+build-time pending status. Device model/OS were not specified.
 
 ## Source map
 
@@ -126,7 +132,7 @@ Karoo 2 at 480×800 pixels / 295 dpi.
 
 `assembleRelease` finalizes tasks generating the external Karoo manifest and
 copying an icon under `app/build/outputs/apk/release/assets/`; description comes
-from the README. README release notes describe the unreleased 0.94 batch and retain historical notes.
+from the README. README release notes describe stable 0.94 and retain historical notes.
 
 Both GitHub workflows are manual (`workflow_dispatch`), run variant-specific
 unit tests, and publish release assets. Instrumentation is not active there.

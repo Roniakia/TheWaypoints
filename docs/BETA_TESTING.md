@@ -1,5 +1,11 @@
 # 0.94 Beta 1 device testing
 
+**Accepted and promoted on 2026-10-21.** The user reported that it works great
+on their real Karoo and authorized stable publication. Device model and OS were
+not specified. Stable 0.94 reuses the original tag and every attached asset;
+no rebuild or app-version change occurred. The checklist below records the beta
+process, not a new request to retest.
+
 Candidate: `v0.94-beta.1`, Android version 0.94 (code 5), application and Karoo
 extension ID `io.github.roniakia.waypoints`. The release's build-info.json records
 the exact source commit, APK SHA-256 and signing certificate fingerprint.

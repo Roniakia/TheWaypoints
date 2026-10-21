@@ -13,9 +13,10 @@ This project is evolving into a new app, starting from
 [dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo). Credit to the
 original author for the idea and initial codebase; further development follows
 this project's own direction.
-Version **0.94 (code 5)** is in beta testing. See
-[0.94 Beta 1](https://github.com/Roniakia/WaypointsKaroo/releases/tag/v0.94-beta.1)
-for the APK and device-test instructions.
+Version **0.94 (code 5)** is stable. Download the APK from the
+[latest release](https://github.com/Roniakia/WaypointsKaroo/releases/latest).
+It is the identical APK accepted during beta testing; existing beta users do not
+need to reinstall.
 
 ## Features
 
@@ -47,7 +48,9 @@ keeps separate bookmarks. Existing upstream bookmarks are not imported automatic
 
 The pinned karoo-ext 1.1.9 release specifies KOS 1.634.2440 or later and does not
 explicitly list Karoo 2 support. This version has passed local tests, but its
-integration with physical Karoo hardware, including Karoo 2, is not yet verified.
+first beta was also accepted by the user after real Karoo testing. The device
+model and OS were not recorded, so this does not establish compatibility with
+every Karoo model, including Karoo 2.
 See the [SDK release notes](https://github.com/hammerheadnav/karoo-ext/releases/tag/1.1.9).
 
 ## Installation and releases
@@ -112,7 +115,10 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ## Release notes
 
-### v0.94 — beta testing
+### v0.94 — stable, 2026-10-21
+
+Promoted from the user-accepted `v0.94-beta.1` without rebuilding or replacing
+the APK. The original tag is retained to preserve the tested source and artifact.
 
 - Remove Firebase Analytics, Crashlytics, and all usage reporting.
 - Update karoo-ext to 1.1.9, Android Gradle Plugin to 8.9.2, Room to 2.8.5,
