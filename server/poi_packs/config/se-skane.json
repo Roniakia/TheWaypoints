@@ -1,0 +1,8 @@
+{
+  "id": "se-skane",
+  "name": "Skåne",
+  "country": "Sweden",
+  "continent": "Europe",
+  "boundary": "se-skane.geojson",
+  "boundary_iso": "SE-M"
+}
