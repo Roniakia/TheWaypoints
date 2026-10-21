@@ -57,3 +57,24 @@ Do not run it as a build verification shortcut.
 - Keep README release notes and published release notes consistent with the
   actual diff and verified results. Preserve previous changelog entries.
 - These requirements do not authorize committing or publishing.
+
+# Product direction and beta releases
+
+- Treat this as an independently evolving app, with substantial new behavior and
+  design expected. The upstream fork supplied the initial idea and codebase;
+  credit the original author and preserve applicable license/copyright notices.
+  Do not describe ongoing development as merely maintaining the upstream fork.
+- After a meaningful change batch passes local checks, proactively propose a
+  tagged GitHub beta prerelease with a downloadable APK for the user to install
+  and test on their real Karoo. Include changes, test steps, and known limitations.
+- Proposing a beta does not authorize creating tags, uploading, publishing, or
+  installing on a device. Proceed when the user accepts that proposal.
+- After the user explicitly accepts the device-test results and authorizes the
+  release, promote the latest accepted beta to a stable GitHub release using the
+  exact tested APK. Preserve its bytes, signing identity, versionName/versionCode,
+  and source commit; do not rebuild or silently substitute a newer candidate.
+- Give each changed, distributed beta a distinct tag and increasing versionCode.
+  Promotion alone does not require a new app version. Track tag, commit, APK hash,
+  changelog, and the user's acceptance so the tested candidate is unambiguous.
+- All source/version changes go through PRs to protected `main`, including release
+  preparation. The old direct-push release workflow needs adaptation before use.

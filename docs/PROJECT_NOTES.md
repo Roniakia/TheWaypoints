@@ -5,6 +5,11 @@ observations, not a claim that the app has been executed successfully.
 
 ## Purpose and current scope
 
+Product direction: develop an independently evolving app with substantial future
+changes. The upstream project supplied the initial idea and starting codebase;
+retain original-author credit and applicable license/copyright notices. The
+GitHub fork relationship describes provenance, not the intended product scope.
+
 Android launcher app integrated with Hammerhead Karoo. Search Photon for POIs,
 optionally bias results by device location, bookmark results in local storage,
 and open a pin in Karoo's native map. Offline support means saved POIs remain
@@ -15,7 +20,8 @@ itself does not calculate routes or render a navigation map.
 
 | Item | Repository value |
 | --- | --- |
-| Module / package | `app` / `de.dimskiy.waypoints` |
+| Module / application ID | `app` / `io.github.roniakia.waypoints` |
+| Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
 | Version | `0.94`, code `5` in `gradle.properties` |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
@@ -113,7 +119,7 @@ are under `app/schemas/`. Preferences file is `location_settings`.
 ## Integration and delivery
 
 Manifest declares a launcher activity, INTERNET permission, extension metadata,
-and an upstream release manifest URL; it does not declare a custom
+and this repository's release manifest URL; it does not declare a custom
 `KarooExtension` service for ride data fields. UI resources include English,
 German, Spanish, French, and Italian strings. Preview configuration targets
 Karoo 2 at 480×800 pixels / 295 dpi.
@@ -126,6 +132,26 @@ Both GitHub workflows are manual (`workflow_dispatch`), run variant-specific
 unit tests, and publish release assets. Instrumentation is not active there.
 **Release-workflow.yml commits and pushes version changes.** Do not dispatch it
 without explicit user authorization. Stage publishes a prerelease as well.
+
+### Intended beta-first delivery
+
+After meaningful work and successful local checks, propose a tagged GitHub beta
+prerelease with a downloadable APK and device-test instructions. Publish only
+after the user accepts the proposal; the user performs real-device testing.
+Record the candidate tag, source commit, APK checksum, app version/code, signing
+identity, changelog, and the user's acceptance of the results.
+
+After explicit acceptance and release authorization, promote the latest accepted
+beta to stable using the same tested APK and source commit. Do not rebuild,
+increment app versions, or replace assets during promotion. Changed distributed
+beta candidates need unique tags and increasing version codes. If stable tagging
+is used, point it to that same commit and reuse the identical APK.
+
+This is the desired workflow, not implemented release automation. `main` now
+requires PRs with no bypass; the existing workflow's direct commit/push conflicts
+with that rule. Adapt release preparation and beta promotion before dispatching
+publishing workflows. Do not equate general positive feedback with acceptance
+of a specific beta or authorization to publish it as stable.
 
 ## Review targets before implementation
 
@@ -149,8 +175,8 @@ verified device failures or changes made during this analysis.
 - Search bookmark matching and unique storage IDs omit OSM object type; investigate
   possible identity collisions before introducing another POI source.
 - Persistence JSON decoding and database failures have no explicit recovery UI.
-- Generated release manifest task reads README/version properties but declares
-  only the template as an input; incremental rebuild freshness needs checking.
+- Release manifest generation tracks its README, template, app ID and version
+  inputs so changed beta metadata regenerates correctly.
 
 ## References
 
@@ -161,3 +187,11 @@ cover newer SDK versions and must not be assumed identical to the pinned version
 - [Hammerhead SDK API](https://hammerheadnav.github.io/karoo-ext/index.html)
 - [Android testing in Studio](https://developer.android.com/studio/test/test-in-android-studio)
 - Local testing details: [LOCAL_TESTING.md](LOCAL_TESTING.md)
+
+## Independent app identity
+
+Application and Karoo extension ID are `io.github.roniakia.waypoints`; the
+internal Kotlin namespace is retained to avoid an unrelated source rename.
+The app installs alongside upstream and starts with independent storage.
+Update metadata points to this repository. A dedicated private signing key is
+kept outside the repository; preserve a private backup for future updates.

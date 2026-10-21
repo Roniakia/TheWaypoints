@@ -27,8 +27,10 @@ Supply package credentials privately if a future environment requires them.
 
 For an isolated app ID, add `-PlocalBuild=true`. It enables only debug and adds
 `.local` to the application ID. Both normal and local modes are telemetry-free.
-Normal debug builds use the device app's original ID; install only on a local
-emulator during this phase. No physical Karoo installation is authorized yet.
+Normal builds use our independent application ID, `io.github.roniakia.waypoints`.
+The user has requested the first beta for their own Karoo testing; installation
+on the physical device is performed by the user. Existing upstream storage stays
+separate.
 
 Reports: `app/build/reports/tests/testDebugUnitTest/index.html`,
 `app/build/reports/lint-results-debug.html`, and
@@ -104,7 +106,18 @@ For 0.94 (5), the normal build (without `-PlocalBuild=true`) passed
 `:app:testDebugUnitTest` (12 tests), `:app:connectedDebugAndroidTest` (18 tests),
 `:app:lintDebug`, and `:app:assembleDebug`. Runtime dependency and packaged
 manifest checks found no Firebase, Crashlytics, or Google measurement entries.
-The APK reports application ID `de.dimskiy.waypoints`, version name 0.94 and code 5.
+The APK reports application ID `io.github.roniakia.waypoints`, version name 0.94 and code 5.
 Both workflow files parsed as YAML after removing Firebase configuration steps.
 The installed personal versioning skill passed the bundled skill validator.
 No publishing workflow or physical device installation was performed.
+
+## First independent beta verification
+
+For candidate `v0.94-beta.1`, application ID `io.github.roniakia.waypoints`,
+12 debug JVM tests, 12 release JVM tests, all 18 API 35 Android tests, release
+lint and signed release assembly passed after the identity change. The release
+APK's signature verifies with our dedicated RSA-3072 signing certificate and
+its launchable activity resolves correctly. The source Kotlin namespace remains
+internal and unchanged. The final downloadable asset is built from the tagged
+commit; its checksum, source SHA and certificate fingerprint are in the release
+assets. See [beta device-test instructions](BETA_TESTING.md).

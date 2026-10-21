@@ -9,8 +9,13 @@ opens selected places in Karoo's native map. Online search uses Photon; saved
 bookmarks remain available offline. Route calculation and navigation are handled
 by Karoo.
 
-This development fork builds on [dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo).
-Version **0.94 (code 5)** is currently unreleased.
+This project is evolving into a new app, starting from
+[dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo). Credit to the
+original author for the idea and initial codebase; further development follows
+this project's own direction.
+Version **0.94 (code 5)** is in beta testing. See
+[0.94 Beta 1](https://github.com/Roniakia/WaypointsKaroo/releases/tag/v0.94-beta.1)
+for the APK and device-test instructions.
 
 ## Features
 
@@ -36,7 +41,9 @@ Bookmarks and the cached search location are stored locally.
 ## Compatibility
 
 The app targets Hammerhead Karoo and depends on its system services for HTTP,
-location, units, and map launch. The Android minimum is API 23.
+location, units, and map launch. The Android minimum is API 23. Our application ID is
+`io.github.roniakia.waypoints`, so it installs alongside the original app and
+keeps separate bookmarks. Existing upstream bookmarks are not imported automatically.
 
 The pinned karoo-ext 1.1.9 release specifies KOS 1.634.2440 or later and does not
 explicitly list Karoo 2 support. This version has passed local tests, but its
@@ -45,11 +52,12 @@ See the [SDK release notes](https://github.com/hammerheadnav/karoo-ext/releases/
 
 ## Installation and releases
 
-This fork has no published APK release yet. Future builds will appear under
-[this repository's releases](https://github.com/Roniakia/WaypointsKaroo/releases).
+Download test builds from [this repository's releases](https://github.com/Roniakia/WaypointsKaroo/releases).
+Betas are GitHub prereleases; the latest accepted beta can become stable using
+the identical tested APK after device-test acceptance and release approval.
 
 The [upstream APK releases](https://github.com/dimskiy/WaypointsKaroo/releases)
-are maintained separately and do not include this fork's unreleased changes.
+are maintained separately and do not include this project's changes.
 The privacy statements above describe this source, not those upstream APKs.
 
 For sideloading instructions, see Hammerhead's
@@ -79,7 +87,7 @@ For a separate debug application ID, add `-PlocalBuild=true`:
 ./gradlew -PlocalBuild=true :app:assembleDebug
 ```
 
-This enables only debug and uses `de.dimskiy.waypoints.local`. It is not a Karoo
+This enables only debug and uses `io.github.roniakia.waypoints.local`. It is not a Karoo
 simulator: a normal Android emulator has no Karoo system service, so full-app
 HTTP, location, units, and map actions need real services or future substitutes.
 
@@ -104,12 +112,13 @@ artifacts, and the release workflow also commits and pushes version changes.
 
 ## Release notes
 
-### v0.94 — unreleased
+### v0.94 — beta testing
 
 - Remove Firebase Analytics, Crashlytics, and all usage reporting.
 - Update karoo-ext to 1.1.9, Android Gradle Plugin to 8.9.2, Room to 2.8.5,
   and DataStore to 1.2.1.
 - Enable KSP2 and align the serialization runtime used by the app and migration tests.
+- Give this app its own identity, signing key, and repository update links.
 - Add an optional separate-ID local debug mode.
 - Align Compose test dependencies and fix Android test packaging.
 - Add regression coverage for search focus, settings persistence, and pin-drop serialization.

@@ -12,7 +12,7 @@ plugins {
 val localBuild = providers.gradleProperty("localBuild").map(String::toBoolean).getOrElse(false)
 
 android {
-    namespace = project.properties["APPLICATION_ID"].toString()
+    namespace = "de.dimskiy.waypoints"
     compileSdk = 35
 
     defaultConfig {
@@ -112,6 +112,10 @@ afterEvaluate {
         val outputFile = outputDir.map { it.file("manifest-karoo.json") }
 
         inputs.file(manifestTemplateFile)
+        inputs.file(readmeFile)
+        inputs.property("applicationId", project.properties["APPLICATION_ID"].toString())
+        inputs.property("versionCode", project.properties["APP_VERSION_CODE"].toString())
+        inputs.property("versionName", project.properties["APP_VERSION_NAME"].toString())
         outputs.file(outputFile)
 
         val getSectionText: (String) -> String = { sectionName ->
