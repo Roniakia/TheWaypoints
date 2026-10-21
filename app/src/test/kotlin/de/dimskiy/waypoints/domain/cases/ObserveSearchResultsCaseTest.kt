@@ -4,10 +4,8 @@ import de.dimskiy.waypoints.DataResult
 import de.dimskiy.waypoints.domain.cases.ObserveSearchResultsCase.Companion.LAST_LOCATION_OBSOLETE_TIMEOUT
 import de.dimskiy.waypoints.domain.model.DeviceLocation
 import de.dimskiy.waypoints.domain.model.DomainError
-import de.dimskiy.waypoints.domain.model.ReportingModel
 import de.dimskiy.waypoints.domain.model.Waypoint
 import de.dimskiy.waypoints.domain.providers.LocationsProvider
-import de.dimskiy.waypoints.domain.providers.ReportingProvider
 import de.dimskiy.waypoints.domain.providers.SettingsProvider
 import de.dimskiy.waypoints.domain.providers.WaypointsSearchProvider
 import de.dimskiy.waypoints.domain.waypointsrepository.WaypointsRepository
@@ -15,7 +13,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -40,7 +37,6 @@ class ObserveSearchResultsCaseTest {
     private val repositoryMock = mockk<WaypointsRepository>(relaxed = true)
     private val locationProviderMock = mockk<LocationsProvider>(relaxed = true)
     private val settingsProviderMock = mockk<SettingsProvider>(relaxed = true)
-    private val reportingProviderMock = mockk<ReportingProvider>(relaxed = true)
     private val currentTimeProviderMock = mockk<Provider<Long>>(relaxed = true)
 
     @Before
@@ -52,7 +48,6 @@ class ObserveSearchResultsCaseTest {
             repositoryMock,
             locationProviderMock,
             settingsProviderMock,
-            reportingProviderMock,
             currentTimeProviderMock
         )
     }
@@ -79,10 +74,6 @@ class ObserveSearchResultsCaseTest {
             query = query,
             expected = DataResult.ready(expectedWaypoints)
         )
-
-        verify {
-            reportingProviderMock.report(ReportingModel.PerformSearch(false))
-        }
     }
 
     @Test
@@ -125,10 +116,6 @@ class ObserveSearchResultsCaseTest {
                 expected = DataResult.ready(expectedWaypoints)
             )
 
-            verify {
-                reportingProviderMock.report(ReportingModel.PerformSearch(true))
-            }
-
             coVerify {
                 settingsProviderMock.saveLocation(expectedLocation)
             }
@@ -163,10 +150,6 @@ class ObserveSearchResultsCaseTest {
                 query = query,
                 expected = DataResult.ready(expectedWaypoints)
             )
-
-            verify {
-                reportingProviderMock.report(ReportingModel.PerformSearch(true))
-            }
         }
 
     @Test
@@ -190,10 +173,6 @@ class ObserveSearchResultsCaseTest {
 
             coVerify {
                 locationProviderMock.observeDeviceLocations()
-            }
-
-            verify {
-                reportingProviderMock.report(ReportingModel.PerformSearch(true))
             }
         }
 
@@ -219,10 +198,6 @@ class ObserveSearchResultsCaseTest {
                 query = query,
                 expected = DataResult.error<List<Waypoint>>(expectedError)
             )
-
-            verify {
-                reportingProviderMock.report(ReportingModel.PerformSearch(true))
-            }
         }
 
     @Test

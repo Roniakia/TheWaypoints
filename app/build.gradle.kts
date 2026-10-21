@@ -7,12 +7,12 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.androidx.room)
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.google.crashlytics)
 }
 
+val localBuild = providers.gradleProperty("localBuild").map(String::toBoolean).getOrElse(false)
+
 android {
-    namespace = project.properties["APPLICATION_ID"].toString()
+    namespace = "de.dimskiy.waypoints"
     compileSdk = 35
 
     defaultConfig {
@@ -35,6 +35,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            if (localBuild) applicationIdSuffix = ".local"
+        }
         release {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("release")
@@ -82,7 +85,14 @@ android {
     packaging {
         resources {
             excludes += "META-INF/gradle/incremental.annotation.processors"
+            merges += setOf("META-INF/LICENSE.md", "META-INF/LICENSE-notice.md")
         }
+    }
+}
+
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        if (localBuild && variant.buildType != "debug") variant.enable = false
     }
 }
 
@@ -102,6 +112,10 @@ afterEvaluate {
         val outputFile = outputDir.map { it.file("manifest-karoo.json") }
 
         inputs.file(manifestTemplateFile)
+        inputs.file(readmeFile)
+        inputs.property("applicationId", project.properties["APPLICATION_ID"].toString())
+        inputs.property("versionCode", project.properties["APP_VERSION_CODE"].toString())
+        inputs.property("versionName", project.properties["APP_VERSION_NAME"].toString())
         outputs.file(outputFile)
 
         val getSectionText: (String) -> String = { sectionName ->
@@ -161,7 +175,7 @@ afterEvaluate {
         }
     }
 
-    tasks.named("assembleRelease") {
+    tasks.matching { it.name == "assembleRelease" }.configureEach {
         finalizedBy(generateKarooAssetsManifest)
         finalizedBy(copyAppIconToAssets)
     }
@@ -169,6 +183,8 @@ afterEvaluate {
 
 dependencies {
     implementation(libs.hammerhead.karoo.ext)
+    // Align the SDK's serialization runtime with Room's migration test helper.
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.bundles.androidx.lifeycle)
     implementation(libs.androidx.appcompat)
@@ -193,12 +209,12 @@ dependencies {
     implementation(libs.swipeview.compose)
     implementation(libs.timber)
 
-    implementation(platform(libs.google.firebase.bom))
-    implementation(libs.google.firebase.analytics)
-    implementation(libs.google.firebase.crashlytics)
-
     debugImplementation(libs.test.compose.manifest)
     testImplementation(libs.bundles.test.core)
-    androidTestImplementation(libs.bundles.test.core)
+    androidTestImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.core)
+    androidTestImplementation(libs.test.androidx.junit.ext)
+    androidTestImplementation(libs.test.coroutines)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test.instrumented.extras)
 }

@@ -2,5 +2,5 @@
 <ExtensionInfo
     displayName="@string/app_name"
     icon="@mipmap/ic_launcher"
-    id="de.dimskiy.waypoints"
+    id="io.github.roniakia.waypoints"
     scansDevices="false" />

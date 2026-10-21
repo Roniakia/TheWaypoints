@@ -1,11 +1,11 @@
 {
   "label": "Waypoints",
   "packageName": "BUMPED BY GRADLE",
-  "iconUrl": "https://github.com/dimskiy/WaypointsKaroo/releases/latest/download/app_icon.webp",
-  "latestApkUrl": "https://github.com/dimskiy/WaypointsKaroo/releases/latest/download/app-release.apk",
+  "iconUrl": "https://github.com/Roniakia/WaypointsKaroo/releases/latest/download/app_icon.webp",
+  "latestApkUrl": "https://github.com/Roniakia/WaypointsKaroo/releases/latest/download/app-release.apk",
   "latestVersion": "BUMPED BY GRADLE",
   "latestVersionCode": "BUMPED BY GRADLE",
-  "developer": "Vadim Sinitskiy",
+  "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "BUMPED BY GRADLE"
+  "releaseNotes": "0.94: Independent app identity; no Firebase or usage reporting; updated Karoo SDK and storage dependencies; local build and regression coverage. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

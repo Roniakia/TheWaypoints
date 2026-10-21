@@ -7,6 +7,4 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.androidx.room) apply false
 
-    alias(libs.plugins.google.services) apply false
-    alias(libs.plugins.google.crashlytics) apply false
 }
