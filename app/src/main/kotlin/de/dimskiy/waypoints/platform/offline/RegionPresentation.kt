@@ -19,6 +19,22 @@ fun recommendedRegionIds(regions: List<CatalogueRegion>, position: PoiPosition?,
         .take(3).map { it.descriptor.id }
 }
 
+fun CatalogueRegion.contains(position: PoiPosition): Boolean {
+    val coordinates = geometry.getAsJsonArray("coordinates")
+    val polygons = if (geometry.get("type").asString == "Polygon") listOf(coordinates)
+        else coordinates.map { it.asJsonArray }
+    return polygons.any { polygon -> polygon.size() > 0 &&
+        inside(polygon[0].asJsonArray, position) && polygon.drop(1).none { inside(it.asJsonArray, position) } }
+}
+
+fun OfflineUiState.needsRegionDownload(): Boolean {
+    if (!ready || page != OfflinePage.POIS) return false
+    if (installed.isEmpty()) return true
+    val point = position ?: return false
+    val containing = catalogue?.regions.orEmpty().filter { it.contains(point) }
+    return containing.isNotEmpty() && containing.none { region -> installed.any { it.id == region.descriptor.id } }
+}
+
 private fun boundaryDistance(region: CatalogueRegion, position: PoiPosition): Double {
     val coordinates = region.geometry.getAsJsonArray("coordinates")
     val polygons = if (region.geometry.get("type").asString == "Polygon") listOf(coordinates)

@@ -19,7 +19,7 @@ require(releaseTag == null || releaseTag.removePrefix("v").substringBefore("-bet
     providers.gradleProperty("APP_VERSION_NAME").get()) {
     "APP_RELEASE_TAG must match APP_VERSION_NAME"
 }
-val releaseAssetBase = "https://github.com/Roniakia/WaypointsKaroo/releases/" +
+val releaseAssetBase = "https://github.com/Roniakia/TheWaypoints/releases/" +
     (releaseTag?.let { "download/$it" } ?: "latest/download")
 val releaseApkName = releaseTag?.let { "waypoints-${it.removePrefix("v")}.apk" } ?: "app-release.apk"
 

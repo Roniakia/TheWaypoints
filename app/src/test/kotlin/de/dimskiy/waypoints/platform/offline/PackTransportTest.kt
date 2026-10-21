@@ -11,7 +11,7 @@ import javax.net.ssl.HttpsURLConnection
 
 class PackTransportTest {
     @get:Rule val temporary = TemporaryFolder()
-    private val url = "https://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-test/region.zip"
+    private val url = "https://github.com/Roniakia/TheWaypoints/releases/download/poi-data-test/region.zip"
     private fun response(status: Int, body: String, range: String? = null) = mockk<HttpsURLConnection>(relaxed = true).apply {
         every { responseCode } returns status
         every { inputStream } answers { ByteArrayInputStream(body.toByteArray()) }

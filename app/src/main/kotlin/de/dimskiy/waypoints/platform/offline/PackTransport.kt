@@ -25,7 +25,7 @@ class HttpsPackTransport(
             connection.instanceFollowRedirects = false
             connection.connectTimeout = 15_000
             connection.readTimeout = 15_000
-            connection.setRequestProperty("User-Agent", "WaypointsKaroo-offline-pois")
+            connection.setRequestProperty("User-Agent", "TheWaypoints-offline-pois")
             connection.setRequestProperty("Accept-Encoding", "identity")
             if (offset > 0) connection.setRequestProperty("Range", "bytes=$offset-")
             val status = connection.responseCode

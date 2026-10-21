@@ -252,3 +252,177 @@ The initial Android unit-test command hit sandbox cache/socket restrictions. Wit
 the existing temporary JDK/SDK/cache and approved local execution,
 `:app:testDebugUnitTest` completed successfully with all 31 tasks up to date; this
 reused existing outputs rather than executing fresh Android tests. App code is unchanged.
+
+## TheWaypoints rename verification (0.96 / 8, unreleased)
+
+On 2026-10-21, all 31 debug JVM tests, debug lint and debug APK assembly passed.
+Generated Karoo metadata was checked for TheWaypoints, 0.96 (8), the unchanged
+application ID and the renamed repository URLs. APK badging confirms the launcher
+label TheWaypoints and application ID `io.github.roniakia.waypoints`.
+Catalogue coverage verifies the unchanged published signature and accepts both
+the historical and renamed repository asset paths. No signed catalogue bytes
+were edited. Emulator instrumentation was not rerun for this branding change;
+no physical Karoo installation or release publishing was performed.
+
+## Search and scrolling refinement (0.96 / 8, unreleased)
+
+On 2026-10-21, all 31 debug JVM tests, debug lint and debug assembly passed.
+All four OfflineHomeTest cases passed on the API 35 emulator with the separate
+local app ID. Coverage includes clearing the search input and triggering only
+one automatic page request per loaded prefix, including a failed-load state.
+Search marks itself busy before its debounce so automatic paging cannot cancel
+an incoming query change. Existing region hierarchy and filter tests also pass.
+No physical Karoo test or publishing was performed.
+
+Regions floating action follow-up: the download/update button and selection
+clear action now stay at the bottom. All 31 JVM tests passed; all four API 35
+OfflineHomeTest cases passed after reserving viewport space above the floating
+controls. The initial content-padding-only layout obscured a checkbox and failed
+the hierarchy test; the final list inset resolves it. The POI filter action now
+uses a bundled vector icon with its existing accessibility label.
+
+## Favorites destination (0.96 / 8, unreleased)
+
+All 32 JVM tests and debug lint passed. The new ViewModel regression covers
+favorites without installed regions, 55-result pagination, text/category filters,
+reactive bookmark removal and separate POI/Favorites search choices. All five
+OfflineHomeTest cases passed on the API 35 emulator with the local app ID,
+including Favorites drawer navigation, clear search and filter/sort application.
+No physical Karoo testing or release publishing was performed.
+
+Floating Regions action visual follow-up: removed the outer Surface/background
+and its shadow, retaining the button, selection clear action and list inset.
+Local debug APK assembly passed and the PC emulator was updated for inspection.
+
+Regions button width/count refinement: the floating action is centered, spans
+available width with 16 dp side margins, and includes the selected count in its
+label. The separate counter/clear button is removed; regions can be deselected
+through their checkboxes. All five API 35 screen tests passed, including the
+updated action/count assertion and selection callback. Emulator app refreshed.
+
+Search placeholder correction: an empty trailing-icon slot reserved width even
+without a clear button, wrapping Search regions. The slot is now null for empty
+queries and placeholders explicitly use one line with ellipsis. All five API 35
+screen tests passed. The visible emulator was updated; UI bounds confirm the
+Regions placeholder height decreased from 74 px (two lines) to 37 px (one line).
+
+## POIs-only download guidance (0.96 / 8)
+
+All 33 JVM tests, debug lint and all five OfflineHomeTest emulator cases passed.
+Coverage checks include no installed regions, unknown location, a missing current
+region, installed coverage, polygon holes, outside-catalogue locations and empty
+search results. The Regions hierarchy test now expands Europe/Sweden to find
+undownloaded regions after removal of the Recommended section. Initial execution
+used its old assertion before that test update; final rerun passed. The local
+emulator was refreshed. Karoo GPS behavior was not tested on physical hardware.
+
+## Pack-only app search (0.96 / 8)
+
+Removed the online search footer and dialog from the app flow. All 33 JVM tests,
+all five OfflineHomeTest API 35 emulator tests, and debug lint passed. The debug
+APK was built as part of instrumentation and the visible emulator refreshed.
+Legacy Photon classes/tests remain internal with no app navigation entry.
+Pack downloads/catalogue refresh still require connectivity. No physical device
+installation or publishing occurred.
+
+## POI category icons (0.96 / 8)
+
+All 33 JVM tests, five API 35 OfflineHomeTest screen tests and debug lint passed
+with the bundled vector icons. A final focused filter/list screen test passed
+after grouping icon and title into one accessible map-opening target. The local
+APK was rebuilt and the visible emulator refreshed. Icons cover every category
+group with a pin fallback for unknown categories. No physical Karoo tested.
+
+## App update channels (0.96 / 8, unreleased)
+
+All 47 normal debug JVM tests and final debug lint passed. New coverage includes
+Stable/Beta release selection, promoted-beta tags, historical repository URLs,
+malformed/mismatched metadata, missing digests and download limits, daily check
+throttling including failures, manual retry, channel persistence, no downgrade,
+APK size/hash/package/version/certificate checks, pre-install revalidation,
+ViewModel download retry/cancellation, and installer-event delivery.
+
+On the API 35 emulator, the two Settings tests and five existing offline screen
+tests passed using `-PlocalBuild=true`. The initial normal-ID run was refused by
+the installed signed release's certificate, so it ran no tests and the existing
+release was preserved. The isolated local-ID rerun passed.
+
+A separate optional instrumentation test verified a real debug-signed higher-code
+APK (temporary local-only 0.97/code 9 fixture) against the installed local
+0.96/code 8 app using API 35 signingInfo, then opened the system installer and
+observed its Update confirmation button. It did not press Update or install the
+fixture. An initial fixture lookup skipped because it used the target asset
+context; the test now reads test-package assets. Resetting the install app-op
+inside instrumentation terminated the test process; cleanup is now left to the
+host/test-package uninstall. The final real-APK confirmation test passed.
+
+To reproduce the optional test, build a `.local` debug APK with command-line
+`-PAPP_VERSION_NAME=0.97 -PAPP_VERSION_CODE=9` overrides and copy it outside the
+repository as `update-candidate.apk`. Restore normal version properties by
+omitting those overrides, then run `:app:connectedDebugAndroidTest` with
+`-PlocalBuild=true -PpoiCompatibilityAssets=<fixture-directory>` and runner class
+`de.dimskiy.waypoints.platform.updates.UpdateInstallerTest`. Without the fixture
+this test skips. Only Android-test assets include it; production APKs do not.
+If using an execution mode that keeps the target installed, reset its app-op
+from the host after instrumentation: `adb shell appops set
+io.github.roniakia.waypoints.local REQUEST_INSTALL_PACKAGES default`.
+
+Read-only verification of published releases confirmed the existing stable APK
+has a GitHub SHA-256 asset digest and its immutable manifest uses the historical
+repository alias handled by the updater. Final local debug assembly and emulator
+refresh use 0.96/code 8. No physical Karoo test, new release, tag, commit or push
+was performed. Real-device unknown-source permission and installer support remain
+unverified; the Settings page offers the APK link for Companion fallback.
+
+The visible emulator was left on Settings. A live Stable check against GitHub
+completed successfully and displayed its last-check time; no update is offered
+because development 0.96/code 8 exceeds the published stable candidate. A fresh
+screenshot was inspected at 480×800: channel chips, installed version, check time
+and the manual check button render correctly in the scrollable page. Final APK
+inspection confirms the higher-version installer fixture is absent.
+
+Settings control refinement: Stable/Beta use mutually exclusive radio rows with
+radio-group accessibility semantics. Check for updates is a full-width floating
+button with 16 dp side/bottom margins, and the scrollable content reserves space
+above it. Both Settings emulator tests passed, covering exclusive selection,
+disabled controls during checks, and unchanged button bounds after scrolling.
+The visible local emulator was updated. Version remains 0.96/code 8.
+
+Shared floating bottom action refinement: Regions and Settings now use one
+FloatingBottomAction component. Only the capsule button paints a background;
+content scrolls behind it with measured trailing padding, replacing the fixed
+viewport inset. Buttons share 16 dp margins, minimum 48 dp touch height, label
+counts/loading and focus clearing. The rule is recorded in AGENTS.md; the round
+POI filter FAB is exempt. All seven Regions/Settings screen tests passed. A final
+focused Regions test passed after preserving focus clearing, and debug lint
+passed. The visible emulator was refreshed. Version remains 0.96/code 8.
+
+Shared bottom-action fade: local debug assembly passed for a decorative linear
+background gradient, 24% opacity at the bottom and transparent at the exact
+measured button top edge. Existing button layout/touch behavior is unchanged;
+no additional interaction tests were needed for this visual-only refinement.
+The emulator was refreshed. Version remains 0.96/code 8.
+
+Karoo yellow accents: all seven Settings/Regions/POI screen tests and debug lint
+passed. Both resource themes use Hammerhead Lemon Yellow #FFE900 and black text
+on filled accent buttons. Selected containers use yellow tints; text-only actions
+use onSurface for readable contrast. The adaptive launcher background also uses
+yellow. Final local debug assembly includes that launcher resource; no dependency
+or app version change was needed for this follow-up within 0.96/code 8.
+
+## 0.96 Beta 1 release verification (2026-10-22)
+
+For v0.96-beta.1, all 47 debug and 47 release JVM tests passed, along with release
+lint and optimized signed release assembly. The full API 35 local-ID emulator
+suite reported 39 tests: 35 passed, four optional tests skipped (live download,
+real Skåne asset, live launcher flow and higher-version installer fixture). The
+installer confirmation fixture was separately verified during updater work; it
+was not included in this final full-suite invocation.
+
+APK badging confirms 0.96/code 8 and package io.github.roniakia.waypoints. Signature
+verification matches the established SHA-256 certificate ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6.
+Packaged MANIFEST_URL and generated APK/icon URLs all reference v0.96-beta.1;
+APK filename is waypoints-0.96-beta.1.apk. The final source commit and exact APK
+hash are attached to the GitHub beta as build-info.json and SHA256SUMS. The
+release is a prerelease; stable 0.95 remains unchanged, with device acceptance
+pending. The release workflow was not used and no physical device was installed.

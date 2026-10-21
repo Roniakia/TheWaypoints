@@ -19,16 +19,16 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.math.*
 
-enum class OfflinePage { POIS, REGIONS }
+enum class OfflinePage { POIS, FAVORITES, REGIONS, SETTINGS }
 data class OfflineRow(val waypoint: Waypoint, val categories: Set<String>, val distanceMetres: Double?)
 data class RegionDownloadStatus(val state: WorkInfo.State, val percent: Int, val error: String?, val phase: String = "download")
 data class OfflineUiState(
-    val ready: Boolean = false, val page: OfflinePage = OfflinePage.REGIONS, val invitation: Boolean = true,
+    val ready: Boolean = false, val page: OfflinePage = OfflinePage.POIS, val invitation: Boolean = true,
     val catalogue: VerifiedCatalogue? = null, val installed: List<InstalledRegion> = emptyList(),
     val recommended: List<String> = emptyList(), val selected: Set<String> = emptySet(), val regionQuery: String = "",
     val downloads: Map<String, RegionDownloadStatus> = emptyMap(), val refreshing: Boolean = false,
     val poiQuery: String = "", val types: Set<String> = PoiTypes.defaults, val sort: PoiSort = PoiSort.NEAREST,
-    val savedOnly: Boolean = false, val rows: List<OfflineRow> = emptyList(), val total: Int = 0, val hasMore: Boolean = false,
+    val rows: List<OfflineRow> = emptyList(), val total: Int = 0, val hasMore: Boolean = false,
     val searching: Boolean = false, val filterCount: Int? = null, val position: PoiPosition? = null, val message: String? = null,
 )
 
@@ -53,7 +53,7 @@ class OfflineViewModel @Inject constructor(
                 val initial = withContext(io) { catalogue.load() to storeProvider.get().installed() }
                 val invitation = preferences.data.first()[dismissed] != true
                 mutable.update { it.copy(ready = true, catalogue = initial.first, installed = initial.second,
-                    invitation = invitation, page = if (invitation) OfflinePage.REGIONS else OfflinePage.POIS,
+                    invitation = invitation, page = it.page,
                     recommended = recommendations(initial.first, it.position)) }
                 search()
                 refreshCatalogue(announceFailure = false)
@@ -62,7 +62,7 @@ class OfflineViewModel @Inject constructor(
         viewModelScope.launch {
             bookmarks.observeWaypointsStored().catch { report(it as? Exception ?: RuntimeException(it)) }.collect { values ->
                 saved = values
-                if (mutable.value.savedOnly) search() else mutable.update { state -> state.copy(rows = state.rows.map { row ->
+                if ((mutable.value.page == OfflinePage.FAVORITES)) search() else mutable.update { state -> state.copy(rows = state.rows.map { row ->
                     val waypoint = saved.firstOrNull { it.serverId == row.waypoint.serverId } ?: row.waypoint.let {
                         Waypoint.Discovered(it.serverId, it.name, it.address, it.latitude, it.longitude)
                     }
@@ -98,12 +98,25 @@ class OfflineViewModel @Inject constructor(
             catch (_: Exception) { /* Locale recommendations and alphabetical search remain usable. */ }
     }
 
-    fun page(page: OfflinePage) { mutable.update { it.copy(page = page) } }
+    private data class SearchOptions(val query: String, val types: Set<String>, val sort: PoiSort)
+    private val pageSearches = mutableMapOf<OfflinePage, SearchOptions>()
+
+    fun page(page: OfflinePage) {
+        val current = mutable.value
+        if (current.page == page) return
+        if (current.page == OfflinePage.POIS || current.page == OfflinePage.FAVORITES) {
+            pageSearches[current.page] = SearchOptions(current.poiQuery, current.types, current.sort)
+        }
+        val options = pageSearches[page] ?: SearchOptions("", PoiTypes.defaults, PoiSort.NEAREST)
+        previewJob?.cancel()
+        mutable.update { it.copy(page = page, poiQuery = options.query, types = options.types,
+            sort = options.sort, rows = emptyList(), total = 0, hasMore = false, filterCount = null) }
+        if (page == OfflinePage.POIS || page == OfflinePage.FAVORITES) search() else searchJob?.cancel()
+    }
     fun regionQuery(query: String) { mutable.update { it.copy(regionQuery = query) } }
     fun select(ids: Set<String>, checked: Boolean) { mutable.update { it.copy(selected = if (checked) it.selected + ids else it.selected - ids) } }
     fun clearSelection() { mutable.update { it.copy(selected = emptySet()) } }
     fun poiQuery(query: String) { mutable.update { it.copy(poiQuery = query) }; search() }
-    fun savedOnly() { mutable.update { it.copy(savedOnly = !it.savedOnly) }; search() }
     fun applyFilters(types: Set<String>, sort: PoiSort) { mutable.update { it.copy(types = types, sort = sort) }; search() }
     fun clearMessage() { mutable.update { it.copy(message = null) } }
     fun skip() = viewModelScope.launch { preferences.edit { it[dismissed] = true }; mutable.update { it.copy(invitation = false, page = OfflinePage.POIS) } }
@@ -149,15 +162,15 @@ class OfflineViewModel @Inject constructor(
 
     fun search(more: Boolean = false) {
         searchJob?.cancel()
+        mutable.update { it.copy(searching = true) }
         searchJob = viewModelScope.launch {
             if (!more) delay(200)
             val state = mutable.value
             val offset = if (more) state.rows.size else 0
-            mutable.update { it.copy(searching = true) }
             try {
                 val job = currentCoroutineContext()
                 val (rows, total, hasMore) = withContext(io) {
-                    if (state.savedOnly) {
+                    if ((state.page == OfflinePage.FAVORITES)) {
                         val all = savedRows(state.poiQuery, state.types, state.sort, state.position)
                         Triple(all.drop(offset).take(50), all.size, offset + 50 < all.size)
                     } else {
@@ -179,7 +192,7 @@ class OfflineViewModel @Inject constructor(
             val state = mutable.value
             val job = currentCoroutineContext()
             val count = withContext(io) {
-                if (state.savedOnly) savedRows(state.poiQuery, types, sort, state.position).size
+                if ((state.page == OfflinePage.FAVORITES)) savedRows(state.poiQuery, types, sort, state.position).size
                 else storeProvider.get().search(PoiSearch(state.poiQuery, types, state.position, sort, pageSize = 1)) { job.ensureActive() }.total
             }
             mutable.update { it.copy(filterCount = count) }

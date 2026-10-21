@@ -60,7 +60,9 @@ object PoiCatalogueVerifier {
         val url = URI(value)
         require(url.scheme == "https" && url.host == "github.com" && url.port == -1 && url.userInfo == null &&
             url.rawQuery == null && url.fragment == null &&
-            url.path.startsWith("/Roniakia/WaypointsKaroo/releases/download/poi-data-") &&
+            // Keep historical signed catalogues valid across the repository rename.
+            (url.path.startsWith("/Roniakia/TheWaypoints/releases/download/poi-data-") ||
+                url.path.startsWith("/Roniakia/WaypointsKaroo/releases/download/poi-data-")) &&
             url.path.split('/').size == 7 && !url.path.contains("..")) { "Unexpected data release URL" }
     }
 }

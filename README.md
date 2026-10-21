@@ -1,33 +1,34 @@
-# Waypoints for Hammerhead Karoo
+# TheWaypoints for Hammerhead Karoo
 
-![Waypoints on Karoo](https://github.com/user-attachments/assets/86102699-c721-4e09-a4a6-bebeafb6c89d)
+![TheWaypoints on Karoo](https://github.com/user-attachments/assets/86102699-c721-4e09-a4a6-bebeafb6c89d)
 
 ## Description
 
-Waypoints searches for points of interest, saves bookmarks on your device, and
-opens selected places in Karoo's native map. Online search uses Photon; saved
-bookmarks remain available offline. Route calculation and navigation are handled
-by Karoo.
+TheWaypoints searches for points of interest, saves bookmarks on your device, and
+opens selected places in Karoo's native map. Development version 0.96 searches
+downloaded regional data packs and saved Favorites locally. Route calculation
+and navigation are handled by Karoo.
 
 This project is evolving into a new app, starting from
 [dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo). Credit to the
 original author for the idea and initial codebase; further development follows
 this project's own direction.
 Version **0.95 (code 7)** is stable. Download the APK from the
-[latest release](https://github.com/Roniakia/WaypointsKaroo/releases/latest).
+[latest release](https://github.com/Roniakia/TheWaypoints/releases/latest).
 It is the identical APK accepted during beta testing; existing beta users do not
 need to reinstall.
 
 ## Features
 
 - Search for restaurants, shops, cafes, and other points of interest.
-- Optionally bias searches toward your device location.
+- Filter downloaded POIs and Favorites by category; sort by name or distance.
 - Open a selected place in Karoo's native map.
 - Save and delete bookmarks in local storage.
-- Display straight-line distances in metric or imperial units.
-- Use Karoo's available connectivity for online search.
+- Display straight-line distances from your device location.
+- Download regional packs for offline POI search.
 
-Offline bookmarks do not provide offline search or route calculation.
+The app does not calculate routes. Stable 0.95 still includes Photon online
+search; pack-only search is part of unreleased 0.96.
 
 ## Privacy
 
@@ -35,16 +36,17 @@ This source contains no Firebase Analytics, Crashlytics, usage tracking, or
 remote crash reporting. Debug logs stay on the device, and no Firebase account
 or configuration file is required to build the app.
 
-Online searches send the query and language to Photon through Karoo's HTTP
-service. Nearby searches also send location coordinates to bias the results.
-Bookmarks and the cached search location are stored locally. In development 0.95,
-regional packs and signed catalogue updates download directly from GitHub. Region
-recommendations use position or locale locally; no analytics is added.
+In development 0.96, POI search queries and location-based sorting stay on the
+device. Regional packs and signed catalogue updates download from GitHub.
+Favorites remain in local storage. App update checks contact GitHub on launch
+at most once daily and when Settings opens; downloading/installing requires an
+explicit action. Stable 0.95 still sends online search queries
+and language to Photon, plus coordinates when nearby search is enabled.
 
 ## Compatibility
 
-The app targets Hammerhead Karoo and depends on its system services for HTTP,
-location, units, and map launch. The Android minimum is API 23. Our application ID is
+The app targets Hammerhead Karoo and depends on its system services for
+location and map launch. The Android minimum is API 23. Our application ID is
 `io.github.roniakia.waypoints`, so it installs alongside the original app and
 keeps separate bookmarks. Existing upstream bookmarks are not imported automatically.
 
@@ -57,7 +59,7 @@ See the [SDK release notes](https://github.com/hammerheadnav/karoo-ext/releases/
 
 ## Installation and releases
 
-Download test builds from [this repository's releases](https://github.com/Roniakia/WaypointsKaroo/releases).
+Download test builds from [this repository's releases](https://github.com/Roniakia/TheWaypoints/releases).
 Betas are GitHub prereleases; the latest accepted beta can become stable using
 the identical tested APK after device-test acceptance and release approval.
 
@@ -126,6 +128,34 @@ in the local testing guide.
 
 ## Release notes
 
+### v0.96 Beta 1 — 2026-10-22
+
+Candidate `v0.96-beta.1`, version 0.96 (code 8). Stable remains 0.95.
+
+- Add Favorites with search, category filters, sorting, automatic paging, and
+  independent search/filter choices from POIs. Favorites survive pack removal.
+- Search downloaded regional packs and saved Favorites locally; remove the
+  online Photon search entry from the app.
+- Add category icons, rounded clearable search fields, and automatic next-page
+  loading with a manual retry action.
+- Start on POIs. Show download guidance only when no regions are installed or
+  the current catalogued region is missing; simplify Regions to downloaded packs
+  and the geographic hierarchy.
+- Standardize full-width floating bottom actions with counts inside, consistent
+  margins and a subtle bottom fade. Keep the separate circular filter icon.
+- Add Settings with Stable/Beta radio selection, daily launch checks, manual
+  checks, release notes, progress/cancellation, and verified APK downloads.
+  Installation uses Android's confirmation screen, with a Companion link fallback.
+- Use Hammerhead Lemon Yellow accents and black button text. Rename the app and
+  Karoo listing to TheWaypoints and update links after the repository rename.
+- Preserve application ID, signing identity, bookmarks and downloaded packs.
+  No dependency upgrade or Room migration is included in this batch.
+
+Only Skåne prototype data is available. New screens are English and offline
+straight-line distances are metric. Real Karoo installer permission, update
+handoff and device performance require beta testing; no maps/routing engine is
+included. Stable-channel selection never downgrades an installed beta.
+
 ### v0.95 — stable, 2026-10-21
 
 Promoted the accepted `v0.95-beta.2` without rebuilding. The tag, versioned APK
@@ -163,10 +193,10 @@ code 6; the app version remains 0.95. The user confirmed it works on their Karoo
 - Add generation/download validation and ten server tests. One invalid source-wide
   swimming-area geometry is documented for review.
 - Data-only prototype: no APK or app version change was included in that release.
-- [Download the data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2).
+- [Download the data prerelease](https://github.com/Roniakia/TheWaypoints/releases/tag/poi-data-2026-10-prototype.2).
   All seven public assets, their checksums and the pinned-key catalogue signature
   were verified after publication. App 0.94 remains the latest stable release.
-- The separate Android foundation ([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3))
+- The separate Android foundation ([draft PR #3](https://github.com/Roniakia/TheWaypoints/pull/3))
   reads the real pack on API 35; 17 JVM tests, 25 emulator tests and lint pass.
   Android uses regular coordinates/FTS4 because stock SQLite lacks RTree.
   Those were intermediate foundation results; later Android download/UI checks

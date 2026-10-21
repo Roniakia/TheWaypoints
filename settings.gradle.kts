@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Waypoints"
+rootProject.name = "TheWaypoints"
 include("app")

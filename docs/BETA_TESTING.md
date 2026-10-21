@@ -1,3 +1,49 @@
+# TheWaypoints 0.96 Beta 1 — device testing pending
+
+Candidate `v0.96-beta.1`, version **0.96 (code 8)**. Stable remains 0.95.
+Upgrade the existing independent app without uninstalling to preserve favorites
+and downloaded packs. Share the APK URL itself with Hammerhead Companion:
+
+https://github.com/Roniakia/TheWaypoints/releases/download/v0.96-beta.1/waypoints-0.96-beta.1.apk
+
+This candidate includes Favorites, pack-only search, category icons, automatic
+paging, Karoo yellow controls, refined Regions guidance and a channel updater.
+The release's build-info.json records the exact source commit, APK SHA-256 and
+signing certificate. Device acceptance is pending; do not promote it to stable
+until this exact APK is accepted.
+
+1. Confirm installation stays at 0.96/code 8 and launcher label TheWaypoints.
+   Record Karoo model and KOS version. Confirm existing favorites/packs remain.
+2. Open POIs with Skåne installed. Check rounded search, clear action, category
+   icons and filters. Search `water`, then scroll to load more results. Empty
+   search results should not recommend downloads if your region is installed.
+3. Favorite POIs, open Favorites and test its text/category filters and sorting.
+   Switch pages and confirm their search choices remain independent. Unfavorite
+   a place and check it disappears. Saved places remain after pack removal.
+4. Open Regions: no download invitation or Recommended section. Test hierarchy,
+   search, selection count inside the full-width bottom button, download/update,
+   cancellation/retry and removal. Content should scroll above the floating action.
+5. With no packs installed, POIs should offer Choose regions. With GPS inside an
+   available but missing region, it should also offer region download guidance.
+   With a pack installed and no position, no location-based prompt is expected.
+6. Open Settings. Check Stable/Beta radio selection, persisted channel, last-check
+   time and floating Check for updates. Stable excludes prereleases; Beta includes
+   both. No update is expected until a candidate with a higher code is published.
+7. On a future update, check release notes, download progress/cancel/retry and the
+   Android install confirmation. Grant unknown-source permission only if you
+   choose to install. If unsupported on Karoo, use the APK link with Companion.
+   Switching back to Stable must not downgrade the beta or erase local data.
+8. With real GPS, check nearest sorting and native Karoo map handoff. Try offline
+   pack search with connectivity disabled. Online Photon search is removed.
+
+Known limitations: only Skåne prototype data (19,159 POIs; one source-wide OSM
+area omitted), English UI and metric offline distances. No map renderer/routing.
+API 23 runtime, Karoo power management, app install permissions and update handoff
+need device validation. Local emulator builds cannot install production updates;
+a higher-version local fixture tested system confirmation without installing.
+
+---
+
 # 0.95 Beta 2 — accepted and promoted to stable
 
 On 2026-10-21 the user confirmed this candidate works on their Karoo and
@@ -12,7 +58,7 @@ as the original testing record.
 
 Candidate `v0.95-beta.2`: app version 0.95, code 7. Share the actual versioned
 APK link to Hammerhead Companion, not the GitHub page or a JSON manifest:
-https://github.com/Roniakia/WaypointsKaroo/releases/download/v0.95-beta.2/waypoints-0.95-beta.2.apk
+https://github.com/Roniakia/TheWaypoints/releases/download/v0.95-beta.2/waypoints-0.95-beta.2.apk
 
 This candidate embeds its own update manifest URL. Confirm Karoo continues to
 show 0.95 (7) through download and installation, then opens Regions with the

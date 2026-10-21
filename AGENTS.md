@@ -78,3 +78,19 @@ Do not run it as a build verification shortcut.
   changelog, and the user's acceptance so the tested candidate is unambiguous.
 - All source/version changes go through PRs to protected `main`, including release
   preparation. The old direct-push release workflow needs adaptation before use.
+
+# Floating bottom action buttons
+
+- Use `FloatingBottomAction` for full-width floating bottom actions, including
+  region download/update and Settings update checks.
+- Use a capsule button with 16 dp side/bottom margins. Do not add a surrounding
+  Surface, card, bottom bar, opaque background panel, border, or shadow.
+- A subtle linear fade may mute content behind the action: theme background at
+  24% opacity at the bottom, fading to transparent exactly at the button's top
+  edge. Its height follows the measured button height plus bottom margin.
+- Keep the action fixed while content scrolls behind it. Use the component's
+  supplied padding inside the scrolling content, not as a fixed viewport inset,
+  so the last item can scroll above the button without creating a footer panel.
+- Put counts inside the button label. Keep loading/disabled behavior on the same
+  button rather than replacing its surrounding layout.
+- The circular POI/Favorites filter FAB is a separate control and is exempt.
