@@ -426,3 +426,11 @@ APK filename is waypoints-0.96-beta.1.apk. The final source commit and exact APK
 hash are attached to the GitHub beta as build-info.json and SHA256SUMS. The
 release is a prerelease; stable 0.95 remains unchanged, with device acceptance
 pending. The release workflow was not used and no physical device was installed.
+
+## Stable 0.96 promotion (2026-10-22)
+
+The user accepted v0.96-beta.1 and authorized stable publication. Promotion changes
+release metadata only and retains its exact APK, signing identity, version/code,
+tag and source commit. No rebuild or test rerun is needed for promotion. The
+original 47 debug/47 release JVM and 35-pass/four-skip emulator results remain
+the recorded local checks. Real-device model/KOS were not specified.
