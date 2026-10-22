@@ -5,7 +5,7 @@
 ## Description
 
 TheWaypoints searches for points of interest, saves bookmarks on your device, and
-opens selected places in Karoo's native map. Development version 0.96 searches
+opens selected places in Karoo's native map. Version 0.96 searches
 downloaded regional data packs and saved Favorites locally. Route calculation
 and navigation are handled by Karoo.
 
@@ -13,7 +13,7 @@ This project is evolving into a new app, starting from
 [dimskiy/WaypointsKaroo](https://github.com/dimskiy/WaypointsKaroo). Credit to the
 original author for the idea and initial codebase; further development follows
 this project's own direction.
-Version **0.95 (code 7)** is stable. Download the APK from the
+Version **0.96 (code 8)** is stable. Download the APK from the
 [latest release](https://github.com/Roniakia/TheWaypoints/releases/latest).
 It is the identical APK accepted during beta testing; existing beta users do not
 need to reinstall.
@@ -27,8 +27,7 @@ need to reinstall.
 - Display straight-line distances from your device location.
 - Download regional packs for offline POI search.
 
-The app does not calculate routes. Stable 0.95 still includes Photon online
-search; pack-only search is part of unreleased 0.96.
+The app does not calculate routes. Previous 0.95 included Photon online search; 0.96 uses pack-only search.
 
 ## Privacy
 
@@ -36,11 +35,11 @@ This source contains no Firebase Analytics, Crashlytics, usage tracking, or
 remote crash reporting. Debug logs stay on the device, and no Firebase account
 or configuration file is required to build the app.
 
-In development 0.96, POI search queries and location-based sorting stay on the
+In 0.96, POI search queries and location-based sorting stay on the
 device. Regional packs and signed catalogue updates download from GitHub.
 Favorites remain in local storage. App update checks contact GitHub on launch
 at most once daily and when Settings opens; downloading/installing requires an
-explicit action. Stable 0.95 still sends online search queries
+explicit action. Previous 0.95 sent online search queries
 and language to Photon, plus coordinates when nearby search is enabled.
 
 ## Compatibility
@@ -128,9 +127,12 @@ in the local testing guide.
 
 ## Release notes
 
-### v0.96 Beta 1 — 2026-10-22
+### v0.96 — stable, 2026-10-22
 
-Candidate `v0.96-beta.1`, version 0.96 (code 8). Stable remains 0.95.
+Promoted the accepted `v0.96-beta.1` without rebuilding: version 0.96 (code 8),
+source `a9bcdbad60f9a5a1633ac66941db66a0a4bbba71`. The tag, APK filename,
+signing identity and all release assets retain their tested beta identity.
+Existing Beta 1 users do not need to reinstall.
 
 - Add Favorites with search, category filters, sorting, automatic paging, and
   independent search/filter choices from POIs. Favorites survive pack removal.
@@ -152,8 +154,9 @@ Candidate `v0.96-beta.1`, version 0.96 (code 8). Stable remains 0.95.
   No dependency upgrade or Room migration is included in this batch.
 
 Only Skåne prototype data is available. New screens are English and offline
-straight-line distances are metric. Real Karoo installer permission, update
-handoff and device performance require beta testing; no maps/routing engine is
+straight-line distances are metric. The user accepted Beta 1 on 2026-10-22; Karoo model/KOS were not specified.
+Installer permission, future update handoff and device performance are not
+comprehensively verified across devices; no maps/routing engine is
 included. Stable-channel selection never downgrades an installed beta.
 
 ### v0.95 — stable, 2026-10-21

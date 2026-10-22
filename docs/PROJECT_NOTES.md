@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.96`, code `8` in `gradle.properties`; stable is 0.95 (7) |
+| Development version | `0.96`, code `8` in `gradle.properties`; stable is 0.96 (8) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -425,3 +425,16 @@ The existing signing certificate and package ID are retained. Stable remains
 unchanged; device acceptance is pending. Exact source/hash are recorded in
 release build-info.json and SHA256SUMS. Source changes target main via a PR;
 no legacy publishing workflow or direct push to main is used.
+
+## Stable 0.96 acceptance (2026-10-22)
+
+The user reported Beta 1 works well and authorized release. Promote the existing
+release to stable/latest while retaining tag v0.96-beta.1 and source
+a9bcdbad60f9a5a1633ac66941db66a0a4bbba71. The exact accepted APK is version
+0.96/code 8, SHA-256 1c0bda0909b35a1fda3e221a2187a7b9d6d261063be5d7c420061eb22d1b660c,
+signed by the established certificate ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6.
+No rebuild, asset replacement, tag move or version increment is needed.
+Original build-info/test assets retain their build-time pending status; release
+metadata and this record capture later acceptance. Model/KOS were not supplied,
+and comprehensive validation of every test step or device is not inferred.
+Acceptance documentation goes through PR #5 alongside the feature source.

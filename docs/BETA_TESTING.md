@@ -1,6 +1,11 @@
-# TheWaypoints 0.96 Beta 1 — device testing pending
+# TheWaypoints 0.96 Beta 1 — accepted and promoted to stable
 
-Candidate `v0.96-beta.1`, version **0.96 (code 8)**. Stable remains 0.95.
+On 2026-10-22 the user reported this candidate works well and authorized stable
+release. Stable 0.96 retains tag `v0.96-beta.1`, version **0.96 (code 8)**, source
+`a9bcdbad60f9a5a1633ac66941db66a0a4bbba71` and the identical signed APK.
+APK SHA-256: `1c0bda0909b35a1fda3e221a2187a7b9d6d261063be5d7c420061eb22d1b660c`.
+No rebuild or asset substitution occurred. Device model/KOS were not provided.
+The steps below remain as the original device-test record.
 Upgrade the existing independent app without uninstalling to preserve favorites
 and downloaded packs. Share the APK URL itself with Hammerhead Companion:
 
@@ -9,8 +14,8 @@ https://github.com/Roniakia/TheWaypoints/releases/download/v0.96-beta.1/waypoint
 This candidate includes Favorites, pack-only search, category icons, automatic
 paging, Karoo yellow controls, refined Regions guidance and a channel updater.
 The release's build-info.json records the exact source commit, APK SHA-256 and
-signing certificate. Device acceptance is pending; do not promote it to stable
-until this exact APK is accepted.
+signing certificate. The release description records acceptance; original build-time assets retain
+their historical pending status.
 
 1. Confirm installation stays at 0.96/code 8 and launcher label TheWaypoints.
    Record Karoo model and KOS version. Confirm existing favorites/packs remain.
