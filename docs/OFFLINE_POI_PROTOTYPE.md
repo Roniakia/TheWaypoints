@@ -101,7 +101,7 @@ cached outputs; no Android implementation changed. `git diff --check` passes.
 An unsigned local catalogue was assembled successfully against the final pack.
 These describe the original server measurement; subsequent results follow.
 
-The [data prerelease](https://github.com/Roniakia/WaypointsKaroo/releases/tag/poi-data-2026-10-prototype.2)
+The [data prerelease](https://github.com/Roniakia/TheWaypoints/releases/tag/poi-data-2026-10-prototype.2)
 was published on 2026-10-21 from generator commit
 `736150d73837247909d34f35e85cf0943f3f70ef`. Seven assets were downloaded back from
 their public URLs; all GitHub digests and SHA256SUMS entries matched. The catalogue
@@ -109,7 +109,7 @@ signature verifies against the tracked Ed25519 public key. App 0.94 remains the
 latest stable release and its manifest still reports versionCode 5.
 
 Separate Android foundation commit `ae78419a9af5ee325e59f6d3de20716f1d9917ae`
-([draft PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3)) imports this
+([draft PR #3](https://github.com/Roniakia/TheWaypoints/pull/3)) imports this
 pack on API 35. Its 17 JVM tests, 25 emulator tests and lint pass. Android SQLite
 lacks RTree, so regular coordinates and FTS4 are used instead of the optional host
 RTree. FTS4 integrity checking needs a writable staging connection; installed

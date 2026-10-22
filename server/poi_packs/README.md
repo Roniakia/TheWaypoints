@@ -96,7 +96,7 @@ Full requirements and later milestones: ../../docs/OFFLINE_POI_PLAN.md.
 ```sh
 python server/poi_packs/catalogue.py \
   --reports server/poi_packs/output/se-skane-2026-10-prototype.1.json \
-  --asset-base-url https://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-2026-10 \
+  --asset-base-url https://github.com/Roniakia/TheWaypoints/releases/download/poi-data-2026-10 \
   --output server/poi_packs/output/catalog.json
 ```
 

@@ -1,11 +1,11 @@
 {
-  "label": "Waypoints",
+  "label": "TheWaypoints",
   "packageName": "BUMPED BY GRADLE",
-  "iconUrl": "https://github.com/Roniakia/WaypointsKaroo/releases/latest/download/app_icon.webp",
-  "latestApkUrl": "https://github.com/Roniakia/WaypointsKaroo/releases/latest/download/app-release.apk",
+  "iconUrl": "https://github.com/Roniakia/TheWaypoints/releases/latest/download/app_icon.webp",
+  "latestApkUrl": "https://github.com/Roniakia/TheWaypoints/releases/latest/download/app-release.apk",
   "latestVersion": "BUMPED BY GRADLE",
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.95 Beta 2: Fix candidate update URL and versioned APK links to avoid stable 0.94 metadata; download signed regional POI packs; search offline by name or category; expandable filters, region updates and preserved bookmarks. Initial Skåne prototype; no offline maps. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.96: TheWaypoints branding, pack-only POI search, Favorites with filters, category icons, rounded clearable search, automatic paging and refined region downloads. Settings adds Stable/Beta update channels and verified APK downloads with system installation confirmation. Existing bookmarks and downloaded packs are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

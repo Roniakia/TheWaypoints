@@ -26,10 +26,11 @@ class PoiCatalogueTest {
 
     @Test fun restrictsAssetUrlsToOurDataReleases() {
         PoiCatalogueVerifier.requireReleaseAsset("https://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-test/catalog.json")
-        for (url in listOf("http://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-test/catalog.json",
-            "https://evil.test/Roniakia/WaypointsKaroo/releases/download/poi-data-test/catalog.json",
-            "https://github.com/Roniakia/WaypointsKaroo/releases/download/v0.94/app.apk",
-            "https://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-test/../secret")) {
+        PoiCatalogueVerifier.requireReleaseAsset("https://github.com/Roniakia/TheWaypoints/releases/download/poi-data-test/catalog.json")
+        for (url in listOf("http://github.com/Roniakia/TheWaypoints/releases/download/poi-data-test/catalog.json",
+            "https://evil.test/Roniakia/TheWaypoints/releases/download/poi-data-test/catalog.json",
+            "https://github.com/Roniakia/TheWaypoints/releases/download/v0.94/app.apk",
+            "https://github.com/Roniakia/TheWaypoints/releases/download/poi-data-test/../secret")) {
             try { PoiCatalogueVerifier.requireReleaseAsset(url); fail(url) } catch (_: IllegalArgumentException) { }
         }
     }
@@ -54,6 +55,25 @@ class PoiCatalogueTest {
         assertEquals(listOf("se-skane"), recommendedRegionIds(listOf(region), PoiPosition(55.605, 13.004), "US"))
         assertEquals(listOf("se-skane"), recommendedRegionIds(listOf(region), null, "SE"))
         assertTrue(recommendedRegionIds(listOf(region), null, "FI").isEmpty())
+    }
+
+    @Test fun downloadGuidanceDependsOnCoverageNotSearchOrNearbyRegions() {
+        val (bytes, signature) = catalogueSeed()
+        val base = PoiCatalogueVerifier.verify(bytes, signature).regions.single()
+        val region = base.copy(geometry = JsonParser.parseString("""{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]],[[4,4],[6,4],[6,6],[4,6],[4,4]]]}""").asJsonObject)
+        val pack = InstalledRegion(region.descriptor.id, region.name, region.descriptor.revision, 1, region.descriptor.sha256)
+        val state = OfflineUiState(ready = true, catalogue = VerifiedCatalogue(listOf(region), ""))
+        assertTrue(state.needsRegionDownload())
+        assertFalse(state.copy(page = OfflinePage.REGIONS).needsRegionDownload())
+        assertFalse(state.copy(page = OfflinePage.FAVORITES).needsRegionDownload())
+        assertFalse(state.copy(ready = false).needsRegionDownload())
+        assertFalse(state.copy(installed = listOf(pack)).needsRegionDownload())
+        val missing = state.copy(installed = listOf(pack.copy(id = "other")))
+        assertFalse(missing.needsRegionDownload()) // Unknown location.
+        assertTrue(missing.copy(position = PoiPosition(2.0, 2.0)).needsRegionDownload())
+        assertFalse(missing.copy(position = PoiPosition(5.0, 5.0)).needsRegionDownload()) // Polygon hole.
+        assertFalse(missing.copy(position = PoiPosition(20.0, 20.0)).needsRegionDownload()) // Outside catalogue.
+        assertFalse(state.copy(installed = listOf(pack), position = PoiPosition(2.0, 2.0), poiQuery = "no matches").needsRegionDownload())
     }
 
     @Test fun containingRegionRanksAheadOfNearestNeighborAndRespectsHoles() {

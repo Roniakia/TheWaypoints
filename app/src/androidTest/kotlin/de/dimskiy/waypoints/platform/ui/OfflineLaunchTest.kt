@@ -23,7 +23,7 @@ class OfflineLaunchTest {
         compose.onNode(hasSetTextAction()).performImeAction()
         compose.waitUntil(15_000) { compose.onAllNodesWithContentDescription("Select Skåne").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithContentDescription("Select Skåne").performScrollTo().performClick()
-        compose.onNodeWithText("Update selected").performClick()
+        compose.onNodeWithText("Update selected · 1").performClick()
         compose.waitUntil(90_000) { compose.onAllNodesWithText("Downloaded · 2026-10-20").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithContentDescription("Choose page").performClick()
         compose.onNodeWithText("POIs", useUnmergedTree = true).performClick()

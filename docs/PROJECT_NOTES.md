@@ -1,4 +1,4 @@
-# Waypoints: project notes
+# TheWaypoints: project notes
 
 Inspected 2026-10-21 at baseline `3f3ed9c` (`master`). These are source-based
 observations, not a claim that the app has been executed successfully.
@@ -10,10 +10,10 @@ changes. The upstream project supplied the initial idea and starting codebase;
 retain original-author credit and applicable license/copyright notices. The
 GitHub fork relationship describes provenance, not the intended product scope.
 
-Android launcher app integrated with Hammerhead Karoo. Search Photon for POIs,
-optionally bias results by device location, bookmark results in local storage,
-and open a pin in Karoo's native map. Offline support means saved POIs remain
-available; online search and route calculation are separate concerns. The app
+Android launcher app integrated with Hammerhead Karoo. Development 0.96 searches
+downloaded regional POI packs and local Favorites, sorts by name or device
+distance, and opens pins in Karoo's native map. Stable 0.95 also included Photon
+search; that app entry has been removed in development. The app
 itself does not calculate routes or render a navigation map.
 
 ## Build and packaging
@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.95`, code `7` in `gradle.properties`; stable is 0.95 (7) |
+| Development version | `0.96`, code `8` in `gradle.properties`; stable is 0.95 (7) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -116,14 +116,14 @@ network, location and environment failures.
 ### Regional offline POIs (0.95, Beta 1 code 6 / Beta 2 code 7)
 
 The generator remains on separate branch `codex/poi-data-pipeline`
-([PR #2](https://github.com/Roniakia/WaypointsKaroo/pull/2)); the Android feature is
-on `codex/offline-poi-regions` ([PR #3](https://github.com/Roniakia/WaypointsKaroo/pull/3)).
+([PR #2](https://github.com/Roniakia/TheWaypoints/pull/2)); the Android feature is
+on `codex/offline-poi-regions` ([PR #3](https://github.com/Roniakia/TheWaypoints/pull/3)).
 The published signed prototype catalogue currently contains only Skåne.
 
-`OfflineHome` replaces the launcher content with compact POIs/Regions screens,
+`OfflineHome` replaces the launcher content with compact POIs/Favorites/Regions screens,
 a menu beside search, first-run invitation, downloaded-first region hierarchy,
 local position/locale recommendations, persistent hidden selections, and
-expandable category filters. Online Photon search remains a secondary action.
+expandable category filters. Online Photon search was a secondary action in 0.95; it is removed in 0.96.
 No offline map renderer or routing is included. New UI is English; offline
 straight-line distances currently use metric units. Karoo device validation is
 pending.
@@ -299,3 +299,129 @@ Its real-pack compatibility and 17 JVM/25 API 35 tests plus lint pass. Stock And
 lacks RTree; the client reads ordinary coordinates/FTS4. Writable integrity checks
 run only on staging copies. At that foundation milestone, signature/download lifecycle and compact screens
 were pending. The later Android implementation and checks are described above.
+
+## TheWaypoints rename (unreleased 0.96 / 8)
+
+Repository renamed to `Roniakia/TheWaypoints`. Launcher label, Karoo listing,
+Gradle project name and maintained links use TheWaypoints. Application ID and
+internal Kotlin namespace stay unchanged to preserve updates and local data.
+Original-author credit and license notices remain. Published signed catalogues
+and historical APKs retain their original bytes and may contain the former URL;
+the repository redirect supports those historical links. Local checkout folder
+remains `WaypointsKaroo` so existing workspace attachments keep working.
+
+## Search and scrolling refinement (unreleased 0.96 / 8)
+
+POI and region search fields use capsule outlines with inline clear actions.
+The POI header spans the available width; saved POIs have a Favorites destination.
+POIs request the next page near the list end, once per loaded prefix, while
+retaining Load more for manual retry after an error.
+
+The Regions download/update action floats at the bottom via Scaffold, spans
+the screen with 16 dp side margins and includes the selected-region count; the region list reserves bottom space to keep its final
+items reachable.
+
+## Favorites page (unreleased 0.96 / 8)
+
+Favorites is a dedicated drawer destination backed by Room bookmarks. It reuses
+the POI list, clearable search, category/sort sheet and automatic paging. Each
+POI destination remembers its own search/filter choices for the ViewModel lifetime.
+Unfavoriting refreshes the Favorites results reactively. Region removal does not
+delete favorites; no storage migration is needed. The previous saved-only chip
+is replaced by this destination. Legacy bookmarks without categories remain
+included when at least one category is selected, as in the previous saved-only view.
+
+## Region download guidance (unreleased 0.96 / 8)
+
+The launcher starts on POIs. Download guidance appears only there, after loading,
+when no packs are installed or a catalogued region containing the current
+position has no installed coverage. Polygon holes are excluded. Unknown location
+or location outside the catalogue does not suggest a nearby region when packs
+are already installed. Empty search results alone never prompt downloads.
+Regions has neither the invitation nor a Recommended section; its downloaded
+section and geographic hierarchy remain. Favorites never shows download guidance.
+
+## Pack-only search (unreleased 0.96 / 8)
+
+Removed the Search online footer and Photon search dialog from OfflineHome.
+The launcher exposes only downloaded-pack POIs, local Favorites and Regions.
+Catalogue refreshes/downloads remain network operations; POI queries stay local.
+Legacy Photon implementation and its regression tests remain internal, without
+an app navigation entry. No bookmark data, Room schema or dependency changed.
+
+## POI category icons (unreleased 0.96 / 8)
+
+POIs and Favorites share local vector category icons on the left of each row.
+All category groups have an icon, cafes have a cup, and unknown/legacy categories
+use a location pin. Multiple categories resolve in stable catalogue order.
+Icons use theme colors and open the same POI as its title; bookmarking remains
+on the right. No network asset, new dependency or storage change is required.
+
+## App update channels (unreleased 0.96 / 8)
+
+Settings is a new drawer destination. DataStore persists Stable (default) or
+Beta. The updater checks the latest 100 repository releases, ignores drafts and
+POI-data releases, reads each eligible immutable Karoo manifest, and selects the
+highest numeric versionCode. Stable excludes prereleases; Beta includes both.
+Promotion's retained beta tag is supported through GitHub's prerelease flag.
+Historical repository aliases in published immutable manifests are accepted.
+Switching to Stable never downgrades; it waits for a higher stable versionCode.
+
+Checks run on launch at most once per 24 hours, including failed attempts, and
+explicitly when Settings opens or the user presses Check for updates. Channel
+changes check immediately. Successful check time is displayed; errors allow a
+manual retry. An available update adds a Settings link above the current page.
+No periodic worker, telemetry, silent download or silent installation is added.
+
+APK downloads use the bounded HTTPS transport and private, per-attempt cache
+files. Release URLs must reference this repository/tag, with an APK asset digest
+and a maximum 200 MiB size. Before installation, the app checks exact size,
+SHA-256, package name, versionName/versionCode and the installed app's signing
+certificate(s). It rechecks the file before granting a scoped FileProvider URI to
+the system installer. REQUEST_INSTALL_PACKAGES is declared; Android 8+ may ask
+for permission via system settings. Installation still needs system confirmation.
+A selectable APK link supports Companion fallback when the installer/settings
+activity is unavailable. Native Karoo behavior requires actual device testing.
+
+Local `.local` builds can check production release metadata but cannot download
+production updates over their different package identity. The Settings UI and
+installer handoff are tested separately with local fixtures. The existing static
+MANIFEST_URL remains pinned for Karoo's own app metadata; channel selection is
+owned by our updater. Future releases must include manifest-karoo.json and a
+matching immutable APK asset with GitHub SHA-256 digest. The legacy committing
+release workflow is not used. Version 0.96 / 8 is reused for this cohesive batch.
+
+Settings channel selection uses a single radio group. Check for updates floats
+at the bottom with 16 dp side/bottom margins, matching the Regions action. Its
+scrolling content uses trailing padding so final settings can clear the action.
+
+## Shared floating bottom action rule
+
+Regions and Settings use FloatingBottomAction: a capsule button with 16 dp
+side/bottom margins, no visible wrapper or shadow. Content scrolls behind the
+action; measured trailing scroll padding lets final items clear the button.
+This replaces fixed viewport insets that looked like a footer panel. Counts and
+loading labels stay inside the button. The circular POI filter FAB is excluded.
+The rule is also recorded in AGENTS.md for future screens.
+
+The shared bottom action includes a subtle linear theme-background fade: 24%
+opacity at the bottom, transparent at the measured button top edge. It follows
+the button height and bottom margin, with no panel, shadow or touch interception.
+
+## Karoo yellow accents (unreleased 0.96 / 8)
+
+Light and dark themes use Hammerhead Lemon Yellow (#FFE900) for primary/tertiary
+accents, with black content on filled yellow buttons. Selected containers use
+yellow tints instead of Material's default purple. Text-only actions use onSurface
+for readability on white; surface variants are neutral. Source: Hammerhead's
+brand guide at https://www.sram.com/globalassets/publicsites/logo-guidelines/h_brandstyleguide.pdf.
+
+## 0.96 Beta 1 preparation (2026-10-22)
+
+The user authorized a beta prerelease and PR. Candidate v0.96-beta.1 reuses the
+unreleased 0.96/code 8 batch, above stable 0.95/code 7. APP_RELEASE_TAG pins
+packaged Karoo metadata and generated assets to the same immutable release.
+The existing signing certificate and package ID are retained. Stable remains
+unchanged; device acceptance is pending. Exact source/hash are recorded in
+release build-info.json and SHA256SUMS. Source changes target main via a PR;
+no legacy publishing workflow or direct push to main is used.

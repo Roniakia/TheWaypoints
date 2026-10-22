@@ -1,7 +1,7 @@
 <resources>
     <string name="photon_service_name" translatable="false">"Photon by Komoot"</string>
     <string name="photon_api_base_url" translatable="false">"https://photon.komoot.io/"</string>
-    <string name="app_name" translatable="false">Waypoints</string>
+    <string name="app_name" translatable="false">TheWaypoints</string>
 
 <!--    max 16 chars-->
     <string name="widget_search_placeholder">Name or address</string>

@@ -15,7 +15,16 @@ fun getDarkColorScheme() = darkColorScheme(
     tertiary = colorResource(R.color.Tertiary),
     background = colorResource(R.color.Background),
     surface = colorResource(R.color.Surface),
-    onPrimary = colorResource(R.color.OnPrimary)
+    onPrimary = colorResource(R.color.OnPrimary),
+    primaryContainer = colorResource(R.color.AccentContainer),
+    onPrimaryContainer = colorResource(R.color.OnAccentContainer),
+    secondaryContainer = colorResource(R.color.AccentContainer),
+    onSecondaryContainer = colorResource(R.color.OnAccentContainer),
+    tertiaryContainer = colorResource(R.color.AccentContainer),
+    onTertiaryContainer = colorResource(R.color.OnAccentContainer),
+    onTertiary = colorResource(R.color.OnPrimary),
+    surfaceVariant = colorResource(R.color.NeutralSurfaceVariant),
+    onSurfaceVariant = colorResource(R.color.OnNeutralSurfaceVariant)
 )
 
 @Composable
@@ -25,7 +34,16 @@ fun getLightColorScheme() = lightColorScheme(
     tertiary = colorResource(R.color.Tertiary),
     background = colorResource(R.color.Background),
     surface = colorResource(R.color.Surface),
-    onPrimary = colorResource(R.color.OnPrimary)
+    onPrimary = colorResource(R.color.OnPrimary),
+    primaryContainer = colorResource(R.color.AccentContainer),
+    onPrimaryContainer = colorResource(R.color.OnAccentContainer),
+    secondaryContainer = colorResource(R.color.AccentContainer),
+    onSecondaryContainer = colorResource(R.color.OnAccentContainer),
+    tertiaryContainer = colorResource(R.color.AccentContainer),
+    onTertiaryContainer = colorResource(R.color.OnAccentContainer),
+    onTertiary = colorResource(R.color.OnPrimary),
+    surfaceVariant = colorResource(R.color.NeutralSurfaceVariant),
+    onSurfaceVariant = colorResource(R.color.OnNeutralSurfaceVariant)
 )
 
 @Composable

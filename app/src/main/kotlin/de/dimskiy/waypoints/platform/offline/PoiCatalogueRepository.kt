@@ -55,6 +55,6 @@ class PoiCatalogueRepository(
     }
 
     companion object {
-        const val RELEASES_URL = "https://api.github.com/repos/Roniakia/WaypointsKaroo/releases?per_page=100"
+        const val RELEASES_URL = "https://api.github.com/repos/Roniakia/TheWaypoints/releases?per_page=100"
     }
 }

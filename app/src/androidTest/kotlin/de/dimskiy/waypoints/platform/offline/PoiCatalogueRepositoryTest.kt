@@ -17,7 +17,7 @@ class PoiCatalogueRepositoryTest {
         val bytes = context.assets.open("poi-catalogue/catalog.json").use { it.readBytes() }
         val signature = context.assets.open("poi-catalogue/catalog.json.sig").use { it.readBytes() }
         val transport = mockk<PackTransport>()
-        val base = "https://github.com/Roniakia/WaypointsKaroo/releases/download/poi-data-2026-10-prototype.2"
+        val base = "https://github.com/Roniakia/TheWaypoints/releases/download/poi-data-2026-10-prototype.2"
         every { transport.read(PoiCatalogueRepository.RELEASES_URL, any(), any()) } returns """[{"tag_name":"poi-data-2026-10-prototype.2","draft":false,"published_at":"2026-10-21T00:00:00Z","assets":[{"name":"catalog.json","browser_download_url":"$base/catalog.json"},{"name":"catalog.json.sig","browser_download_url":"$base/catalog.json.sig"}]}]""".toByteArray()
         every { transport.read("$base/catalog.json", any(), any()) } returns bytes
         every { transport.read("$base/catalog.json.sig", any(), any()) } returns signature
