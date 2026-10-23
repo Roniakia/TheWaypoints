@@ -1,5 +1,23 @@
 # Release notes
 
+### v0.99 — Beta 3, 2026-10-23
+
+Version 0.99/code 13; candidate `v0.99-beta.3`; device acceptance pending. Earlier beta assets remain unchanged.
+
+- Move the yellow POI distance badge to the right-hand position formerly used by
+  the favorite toggle, leaving more room beside the POI name.
+- Show a gold star immediately after a favorited POI name. Unfavorited POIs
+  have no star. Long names can wrap while retaining a visible favorite marker.
+- Swipe a POI from right to left to add/remove it from Favorites. A completed
+  swipe toggles once; partial or reverse swipes do not. The row returns to rest.
+- Apply the same gesture in Favorites, where removing an item removes its row.
+  Accessibility services get named Add to favorites/Remove from favorites actions.
+- Swipe cues show muted Hammerhead-colored +star when adding and muted-red minus-star
+  when removing. A first-use swipe-and-return hint on the first POI demonstrates
+  the gesture only for users with no Favorites; its shown state is remembered.
+- Tapping the row or distance still selects the POI and opens Karoo’s map.
+  Native single-cell ride fields and Open POIs controller action are retained.
+
 ### v0.99 — Beta 2, 2026-10-23
 
 Version 0.99/code 12; candidate `v0.99-beta.2`. Published Beta 1 remains unchanged.

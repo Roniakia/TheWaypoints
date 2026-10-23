@@ -1,5 +1,10 @@
 package de.dimskiy.waypoints.platform.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,12 +20,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import de.dimskiy.waypoints.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -28,11 +35,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +73,7 @@ data class OfflineActions(
     val remove: (String) -> Unit = {}, val cancel: (String) -> Unit = {},
     val open: (OfflineRow) -> Unit = {}, val bookmark: (OfflineRow) -> Unit = {}, val more: () -> Unit = {},
     val filters: (Set<String>, PoiSort) -> Unit = { _, _ -> }, val preview: (Set<String>, PoiSort) -> Unit = { _, _ -> },
-    val clearMessage: () -> Unit = {},
+    val clearMessage: () -> Unit = {}, val swipeHintShown: () -> Unit = {},
 )
 
 @Composable
@@ -74,7 +90,7 @@ fun OfflineHome(viewModel: OfflineViewModel = hiltViewModel(), updates: AppUpdat
     OfflineHomeContent(state, OfflineActions(viewModel::page, viewModel::regionQuery, viewModel::poiQuery,
         viewModel::select, viewModel::clearSelection, { viewModel.refreshCatalogue() }, { viewModel.updateRegions() }, { viewModel.skip() },
         { viewModel.remove(it) }, viewModel::cancel, { viewModel.open(it) }, { viewModel.bookmark(it) },
-        { viewModel.search(more = true) }, viewModel::applyFilters, viewModel::previewFilters, viewModel::clearMessage), updateState) { AppUpdateSettings(updates) }
+        { viewModel.search(more = true) }, viewModel::applyFilters, viewModel::previewFilters, viewModel::clearMessage, viewModel::swipeHintShown), updateState) { AppUpdateSettings(updates) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,9 +272,114 @@ private fun RegionRow(region: CatalogueRegion, installed: InstalledRegion?, stat
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PoiSwipeRow(row: OfflineRow, actions: OfflineActions, showHint: Boolean = false, onHintFinished: () -> Unit = {}) {
+    val hintOffset = remember { Animatable(0f) }
+    val hintDistance = with(LocalDensity.current) { 48.dp.toPx() }
+    var hintInterrupted by remember(showHint) { mutableStateOf(false) }
+    val latestHintFinished by rememberUpdatedState(onHintFinished)
+    LaunchedEffect(showHint, hintInterrupted) {
+        if (!showHint || hintInterrupted) {
+            hintOffset.snapTo(0f)
+            if (showHint) latestHintFinished()
+            return@LaunchedEffect
+        }
+        // Use the animation clock for the short pause as well as the motion.
+        hintOffset.animateTo(0f, tween(350))
+        hintOffset.animateTo(-hintDistance, tween(220))
+        hintOffset.animateTo(0f, spring(dampingRatio = 0.55f, stiffness = 350f))
+        latestHintFinished()
+    }
+    val latestRow by rememberUpdatedState(row)
+    val latestBookmark by rememberUpdatedState(actions.bookmark)
+    val swipe = rememberSwipeToDismissBoxState()
+    val favorite = row.waypoint is Waypoint.Stored
+    val cueColor = if (favorite) lerp(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.background, 0.3f)
+        else lerp(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onSurfaceVariant, 0.4f)
+    val toggleLabel = if (favorite) "Remove from favorites" else "Add to favorites"
+    LaunchedEffect(swipe.currentValue) {
+        if (swipe.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            latestBookmark(latestRow)
+            swipe.reset()
+        }
+    }
+    SwipeToDismissBox(
+        state = swipe,
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true,
+        modifier = Modifier.testTag("poi-row-${row.waypoint.serverId}"),
+        backgroundContent = {
+            Box(Modifier.fillMaxSize().background(lerp(MaterialTheme.colorScheme.background, cueColor, 0.12f))
+                .clearAndSetSemantics {}.padding(horizontal = 6.dp), contentAlignment = Alignment.CenterEnd) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+                    Text(if (favorite) "−" else "+", color = cueColor, style = MaterialTheme.typography.labelLarge)
+                    Icon(Icons.Default.Star, contentDescription = null, tint = cueColor, modifier = Modifier.size(18.dp))
+                }
+            }
+        },
+    ) {
+        Row(Modifier.offset { IntOffset(hintOffset.value.roundToInt(), 0) }
+            .testTag("poi-content-${row.waypoint.serverId}")
+            .pointerInput(showHint) {
+                if (showHint) awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    hintInterrupted = true
+                }
+            }
+            .fillMaxWidth().background(MaterialTheme.colorScheme.background)
+            .clickable { actions.open(row) }
+            .semantics {
+                stateDescription = if (favorite) "Favorite" else "Not favorited"
+                customActions = listOf(CustomAccessibilityAction(toggleLabel) {
+                    actions.bookmark(row)
+                    true
+                })
+            }
+            .padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(poiCategoryIcon(row.categories)), contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(end = 10.dp).size(24.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(row.waypoint.name, modifier = Modifier.weight(1f, fill = false), maxLines = 2,
+                        overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                    if (favorite) Text("★", modifier = Modifier.padding(start = 4.dp),
+                        color = Color(0xFFFFD700), style = MaterialTheme.typography.bodyMedium)
+                }
+                val type = row.categories.firstOrNull()?.let(PoiTypes::label) ?: "POI"
+                val address = row.waypoint.address.getFormatted().takeIf(String::isNotBlank)
+                val coordinate = "%.4f, %.4f".format(Locale.ROOT, row.waypoint.latitude, row.waypoint.longitude)
+                Text(type, style = MaterialTheme.typography.labelSmall)
+                Text(listOfNotNull(address, coordinate).joinToString(" · "), style = MaterialTheme.typography.labelSmall)
+            }
+            row.distanceMetres?.let { metres ->
+                val distance = if (metres < 1000) "${metres.toInt()}m" else "${"%.1f".format(Locale.ROOT, metres / 1000)}km"
+                Text(distance, modifier = Modifier.padding(start = 8.dp)
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.labelMedium, maxLines = 1)
+            }
+        }
+    }
+}
+
 @Composable
 private fun ColumnScope.PoiList(state: OfflineUiState, actions: OfflineActions) {
     val listState = rememberLazyListState()
+    var hintRow by remember { mutableStateOf<String?>(null) }
+    var hintAttempted by remember { mutableStateOf(false) }
+    val firstRow = state.rows.firstOrNull()?.waypoint?.serverId
+    LaunchedEffect(state.page, state.ready, state.favoritesLoaded, state.hasFavorites, state.swipeHintSeen, firstRow) {
+        if (state.page != OfflinePage.POIS || state.hasFavorites) hintRow = null
+        else if (state.ready && state.favoritesLoaded && !state.swipeHintSeen && firstRow != null && !hintAttempted) {
+            hintAttempted = true
+            hintRow = firstRow
+            actions.swipeHintShown()
+        }
+    }
     val nearEnd by remember {
         derivedStateOf {
             val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
@@ -287,37 +408,7 @@ private fun ColumnScope.PoiList(state: OfflineUiState, actions: OfflineActions) 
     if (state.searching) LinearProgressIndicator(Modifier.fillMaxWidth())
     LazyColumn(Modifier.weight(1f).fillMaxWidth().testTag("poi-list"), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
         items(state.rows, key = { it.waypoint.serverId }) { row ->
-            Row(Modifier.fillMaxWidth().padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Row(Modifier.weight(1f).clickable { actions.open(row) }, verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(poiCategoryIcon(row.categories)), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(end = 10.dp).size(24.dp))
-                    Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
-                        val distance = row.distanceMetres?.let { if (it < 1000) "${it.toInt()}m" else "${"%.1f".format(Locale.ROOT, it / 1000)}km" }
-                        val type = row.categories.firstOrNull()?.let(PoiTypes::label) ?: "POI"
-                        val address = row.waypoint.address.getFormatted().takeIf(String::isNotBlank)
-                        val coordinate = "%.4f, %.4f".format(Locale.ROOT, row.waypoint.latitude, row.waypoint.longitude)
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            if (distance != null) Text(
-                                distance,
-                                modifier = Modifier.background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                style = MaterialTheme.typography.labelMedium,
-                                maxLines = 1,
-                            )
-                            Text(row.waypoint.name, modifier = Modifier.weight(1f), maxLines = 2,
-                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
-                        }
-                        Text(type, style = MaterialTheme.typography.labelSmall)
-                        Text(listOfNotNull(address, coordinate).joinToString(" · "), style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-                IconButton(onClick = { actions.bookmark(row) }, modifier = Modifier.semantics { contentDescription = "Bookmark ${row.waypoint.name}" }) {
-                    Text(if (row.waypoint is Waypoint.Stored) "★" else "☆",
-                        color = if (row.waypoint is Waypoint.Stored) Color(0xFFFFD700) else MaterialTheme.colorScheme.onSurface)
-                }
-            }
+            PoiSwipeRow(row, actions, showHint = hintRow == row.waypoint.serverId, onHintFinished = { hintRow = null })
             HorizontalDivider()
         }
         if (state.rows.isEmpty() && !state.searching && state.ready) item {

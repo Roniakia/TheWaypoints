@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.99`, code `12` in `gradle.properties`; stable is 0.98 (10) |
+| Development version | `0.99`, code `13` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -631,3 +631,55 @@ PR #9 targets main and is updated for native fields and the Open POIs controller
 action. Stable 0.98 and distributed Beta 1 remain unchanged. Beta 2 device testing
 is pending, including actual one-cell sizing, controller dispatch, units and
 outdoor GPS/arrival behavior. No physical device install or legacy workflow is used.
+
+## POI trailing distances and swipe Favorites (0.99 Beta 3 / code 13)
+
+Requested after real-device list feedback, implemented on a new feature branch
+codex/poi-list-swipe, with publication and updating PR #9 explicitly authorized.
+The distance badge occupies the trailing row slot; there is no favorite IconButton.
+A gold star follows the name only for stored POIs, with space reserved so an
+ellipsized long name does not hide its marker. Details remain type followed by
+address/coordinates. Missing GPS/distance leaves the trailing slot empty.
+
+Material 3 SwipeToDismissBox (already present in the pinned dependency set) enables
+only EndToStart. Reaching the dismissed anchor toggles Favorites once and resets
+the swipe; incomplete/reverse gestures do not toggle. rememberUpdatedState keeps
+the latest POI and callback when Room updates the same list key. In Favorites,
+unbookmarking can remove that item before reset. The row remains the map-opening
+click target, including its distance badge. Named custom accessibility actions
+provide the same toggle without requiring a gesture. Existing focus dismissal and
+paging remain. No Room schema, new permission, dependency or telemetry change.
+
+Beta 2 was published at 6d09836510ad91929c4460be884251f7aa7a4f69, APK SHA-256
+123e3eaf8b6c8b95a28c18d2c966d9605e7721f1c6d6afc946643259d3a73709. It remains a
+prerelease pending device acceptance. Beta 3 advances versionCode to 13 while
+retaining the cohesive 0.99 batch. Stable 0.98 and prior beta assets remain intact.
+
+POI list verification: 62 debug JVM tests, 13 focused API 35 emulator tests, debug
+lint and assembly passed. Saved-row and long-name screenshots were inspected at
+480x800. Detailed gesture coverage and initial test fixes are in LOCAL_TESTING.md.
+
+Beta 3 follow-up before publication: swipe action cues are plus + a star icon in
+a muted Hammerhead yellow, or minus + star in muted red for removal. No visible
+Add/Remove sentence is needed; named accessibility actions remain. A first-row
+48dp left-and-spring-back hint runs once after the initial populated POI list
+appears, only after Favorites and preferences load and when no Favorites exist.
+DataStore poiSwipeHintSeen persists the shown state, including after restart or
+subsequent removal of all Favorites. Touch interrupts the cosmetic offset. The
+hint does not change SwipeToDismissBox state, select POIs or toggle Favorites.
+No first-use flag is consumed while there are no rows to demonstrate.
+
+## 0.99 Beta 3 release preparation (2026-10-23)
+
+Final candidate v0.99-beta.3 (0.99/code 13) passed 63 debug and 63 release JVM
+tests, 16 focused API 35 emulator tests, debug/release lint, debug assembly and
+optimized signed release assembly. Add/remove cue, first-row hint, saved-row and
+long-name screenshots were visually inspected at 480x800. Candidate package,
+version/code, established signing certificate, immutable URLs and APK SHA-256
+are verified before upload and recorded with the clean source commit.
+
+The user explicitly authorized the POI row changes, muted cues, one-time hint,
+commit/build/publication and updating PR #9. Source is prepared on a new feature
+branch and fast-forwarded into the existing PR's head, preserving review to main.
+Stable 0.98 and Beta 1/Beta 2 assets remain unchanged. Beta 3 device acceptance is
+pending; no physical installation, full emulator suite or legacy workflow run.

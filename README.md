@@ -127,7 +127,7 @@ in the local testing guide.
 
 ## Release notes
 
-Development 0.99 Beta 2 (unreleased, code 12) uses one-cell native Nearest POI and Selected POI distance fields plus an Open POIs controller action. Tap a POI in the app to select it; the selected field clears on confirmed arrival.
+Development 0.99 Beta 3 (code 13) moves POI distances to the right and toggles Favorites with a right-to-left swipe. Favorited names show a gold star. Muted swipe cues and a one-time first-row hint demonstrate the gesture. Native single-cell POI fields and the Open POIs controller action are retained.
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md) for version history and changelogs.
 For manual beta publishing and stable promotion, see [the release guide](docs/RELEASING.md).

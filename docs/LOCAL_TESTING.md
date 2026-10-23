@@ -656,3 +656,63 @@ PR #9 targets main and is updated for native fields and the Open POIs controller
 action. Stable 0.98 and distributed Beta 1 remain unchanged. Beta 2 device testing
 is pending, including actual one-cell sizing, controller dispatch, units and
 outdoor GPS/arrival behavior. No physical device install or legacy workflow is used.
+
+## POI trailing distances and swipe Favorites (0.99 Beta 3 / code 13)
+
+All 62 normal-ID debug JVM tests, debug lint and debug assembly passed. All 13
+focused API 35 local-ID emulator tests passed: nine OfflineHomeTest cases and
+four PoiFieldTest cases. The new gesture cases check single add/remove toggles,
+reverse/partial swipes, long-name favorite visibility, removal from Favorites,
+right-side distance placement, distance tapping, no map launch during swipes,
+and the named accessibility action. Existing paging/search/focus tests pass.
+
+480x800 screenshots of a saved POI with distance and a long saved name without
+distance were visually inspected. The badge is right-aligned, the saved star
+follows the name and remains visible with ellipsis, and type/coordinates remain
+below. Background swipe hints are hidden from accessibility; named row actions
+provide the toggle. The local emulator was restarted after disconnecting before
+the initial instrumentation attempt, which ran no tests. A duplicate fixture
+name/category selector and a custom-accessibility test API mismatch were fixed;
+the final suite has zero failures/skips. No physical Karoo installation occurred.
+
+The existing native fields and controller action still need actual Karoo layout,
+controller dispatch, unit and GPS/arrival retesting. The full emulator suite was
+not rerun for this candidate. Signed-release checks are recorded below when done.
+
+### Muted cues and persisted first-use hint (same Beta 3 / code 13)
+
+The follow-up adds compact +star and minus-star cues in muted Hammerhead yellow
+and muted red. A cosmetic first-row offset demonstrates a left swipe once for
+users with no Favorites. Favorites and preferences must both load first; the
+hint is not consumed on an empty list. The shown flag survives DataStore reopen,
+and removing all Favorites later does not re-enable it. Motion uses the Compose
+animation clock, returns to zero and is interrupted by touch without toggling.
+The swipe component's state is never changed by the hint.
+
+The added JVM persistence case passed (63 debug tests total). Initial animation
+verification used clipped bounds; it now checks the actual position and advances
+the animation clock. A first visual pass found the plus/minus could be clipped
+at a small reveal; compact cue sizing keeps the complete symbol pair visible.
+Final full focused-suite and release results are recorded with the candidate.
+
+Final hint/cue verification: all 16 focused API 35 emulator tests passed (12 POI
+screen cases plus four native-field cases). Add and remove cue screenshots were
+visually inspected at 480x800: the full plus/minus-star pair is visible during a
+small reveal. The first-row hint moves only that row, returns to rest, remembers
+its shown state and stops on touch; it never toggles or opens a POI itself. All
+63 debug JVM tests, debug lint and debug assembly passed on the final source.
+
+## 0.99 Beta 3 release preparation (2026-10-23)
+
+Final candidate v0.99-beta.3 (0.99/code 13) passed 63 debug and 63 release JVM
+tests, 16 focused API 35 emulator tests, debug/release lint, debug assembly and
+optimized signed release assembly. Add/remove cue, first-row hint, saved-row and
+long-name screenshots were visually inspected at 480x800. Candidate package,
+version/code, established signing certificate, immutable URLs and APK SHA-256
+are verified before upload and recorded with the clean source commit.
+
+The user explicitly authorized the POI row changes, muted cues, one-time hint,
+commit/build/publication and updating PR #9. Source is prepared on a new feature
+branch and fast-forwarded into the existing PR's head, preserving review to main.
+Stable 0.98 and Beta 1/Beta 2 assets remain unchanged. Beta 3 device acceptance is
+pending; no physical installation, full emulator suite or legacy workflow run.
