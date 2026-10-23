@@ -127,6 +127,25 @@ in the local testing guide.
 
 ## Release notes
 
+### v0.97 — Beta 1, 2026-10-23
+
+Version 0.97 (code 9), candidate `v0.97-beta.1`; device acceptance pending.
+
+- Addresses use street, house number and city without bracketed country codes.
+- POI rows show distance beside the name, type below, then address and coordinates.
+- Empty Favorites distinguishes no saved places from no search/filter matches,
+  without a Browse POIs action.
+- Sidebar items have side margins, boxier corners and a bright Karoo yellow
+  selection with black text.
+- Region download guidance uses a Karoo yellow arrow. Disabled bottom actions
+  have an opaque gray fill so scrolling content cannot show through.
+- Saved POI stars are gold. Scrolling dismisses the search keyboard; tap the
+  field again to resume typing.
+- Search fields are slightly shorter with margins around the page header.
+- POI and Favorites rows show compact straight-line distances, such as `100m`
+  and `1.2km`, in a Hammerhead yellow label when a location is available.
+
+
 ### v0.96 — stable, 2026-10-22
 
 Promoted the accepted `v0.96-beta.1` without rebuilding: version 0.96 (code 8),

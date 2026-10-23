@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.96`, code `8` in `gradle.properties`; stable is 0.96 (8) |
+| Development version | `0.97`, code `9` in `gradle.properties`; stable is 0.96 (8) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -438,3 +438,55 @@ Original build-info/test assets retain their build-time pending status; release
 metadata and this record capture later acceptance. Model/KOS were not supplied,
 and comprehensive validation of every test step or device is not inferred.
 Acceptance documentation goes through PR #5 alongside the feature source.
+
+## POI distance labels (unreleased 0.97 / 9)
+
+POIs and Favorites show the existing straight-line distance in a separate compact
+Hammerhead yellow badge with black text (`100m`, `1.2km`). Unknown distances stay
+hidden; existing location refresh and sorting behavior are unchanged. Development
+builds no longer point at the previously distributed 0.96 beta manifest.
+
+Search header refinement: POIs, Favorites and Regions share 52 dp capsule inputs
+with 8 dp horizontal/vertical header margins so borders clear adjacent edges.
+Menu, clear and refresh controls remain centered with their existing touch targets.
+
+Saved POI stars use gold (#FFD700). User scroll gestures clear search focus and
+dismiss the keyboard across page lists; tapping an input focuses it again.
+
+Region download guidance uses a Karoo yellow forward arrow retaining the
+Choose regions accessibility label. FloatingBottomAction precomposites its
+disabled gray fill over opaque theme background; content cannot show through
+the disabled capsule on Regions or Settings. The surrounding fade is unchanged.
+
+Sidebar refinement (0.97 / 9): navigation items use 12 dp side margins, 3 dp
+vertical spacing and 6 dp corners. Selected items use full Karoo yellow with
+black text in both themes. The four destinations share this styling.
+
+Region guidance uses one-line copy: Download regions for POIs / Download this
+region, with ellipsis for unusually large font settings or narrow screens.
+
+Region guidance is a full-width, minimum 48 dp clickable row. Its yellow arrow
+follows the one-line text with an 8 dp gap; the whole row opens Regions.
+
+Favorites empty state: No favorites added yet for blank search and default/all
+categories; No matching favorite POIs for a search or custom category restriction
+(including no active categories). Sort alone does not affect the message. Removed
+the Browse POIs action. Version remains in the pending 0.97 / 9 UI batch.
+
+POI/Favorites rows now put the distance badge before the name, category on its
+own line (POI fallback), and address · latitude, longitude below. Coordinates
+always show, including when distance/address are available; absent addresses do
+not add a leading separator. Detail text wraps to preserve address/coordinates.
+
+Address formatting now uses street + house number, city (for example
+Bogesholmsvägen 1, Kävlinge), omitting country codes and bracket syntax. Blank
+parts are trimmed/omitted; coordinates remain available for missing addresses.
+Only presentation changes; pack tags and stored address fields are preserved.
+
+## 0.97 Beta 1 candidate (2026-10-23)
+
+Candidate v0.97-beta.1 is 0.97/code 9, with the established signing identity and
+candidate-specific update URLs. Changes are confined to POI/address presentation
+and UI refinements; no dependency/storage/data-pack change is included. Stable
+0.96 remains unchanged and real Karoo acceptance is pending. Candidate identity
+is recorded in release build-info.json/SHA256SUMS and LOCAL_TESTING.md.

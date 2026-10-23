@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -29,6 +31,9 @@ fun FloatingBottomAction(label: String, onClick: () -> Unit, enabled: Boolean = 
         Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(clearance - 16.dp)
             .background(Brush.verticalGradient(listOf(background.copy(alpha = 0f), background.copy(alpha = .24f)))))
         Button(onClick = { focus.clearFocus(); onClick() }, enabled = enabled, shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .12f)
+                    .compositeOver(background.copy(alpha = 1f))),
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .onSizeChanged { clearance = with(density) { it.height.toDp() } + 32.dp }

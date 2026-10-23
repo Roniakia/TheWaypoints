@@ -1,14 +1,17 @@
 package de.dimskiy.waypoints.platform.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
@@ -16,10 +19,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import de.dimskiy.waypoints.R
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
@@ -76,20 +85,30 @@ fun OfflineHomeContent(state: OfflineUiState, actions: OfflineActions = OfflineA
     val snackbar = remember { SnackbarHostState() }
     val focus = LocalFocusManager.current
     var filters by remember { mutableStateOf(false) }
+    val dismissSearchOnScroll = remember(focus) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (source == NestedScrollSource.Drag && available.y != 0f) focus.clearFocus()
+                return Offset.Zero
+            }
+        }
+    }
     LaunchedEffect(state.message) {
         state.message?.let { snackbar.showSnackbar(it); actions.clearMessage() }
     }
     ModalNavigationDrawer(drawerState = drawer, drawerContent = {
         ModalDrawerSheet(Modifier.widthIn(max = 240.dp)) {
             Spacer(Modifier.height(8.dp))
-            NavigationDrawerItem(label = { Text("POIs") }, selected = state.page == OfflinePage.POIS,
-                onClick = { actions.page(OfflinePage.POIS); scope.launch { drawer.close() } })
-            NavigationDrawerItem(label = { Text("Favorites") }, selected = state.page == OfflinePage.FAVORITES,
-                onClick = { actions.page(OfflinePage.FAVORITES); scope.launch { drawer.close() } })
-            NavigationDrawerItem(label = { Text("Regions") }, selected = state.page == OfflinePage.REGIONS,
-                onClick = { actions.page(OfflinePage.REGIONS); scope.launch { drawer.close() } })
-            NavigationDrawerItem(label = { Text("Settings") }, selected = state.page == OfflinePage.SETTINGS,
-                onClick = { actions.page(OfflinePage.SETTINGS); scope.launch { drawer.close() } })
+            listOf(OfflinePage.POIS to "POIs", OfflinePage.FAVORITES to "Favorites",
+                OfflinePage.REGIONS to "Regions", OfflinePage.SETTINGS to "Settings").forEach { (page, label) ->
+                NavigationDrawerItem(label = { Text(label) }, selected = state.page == page,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 3.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.onPrimary),
+                    onClick = { actions.page(page); scope.launch { drawer.close() } })
+            }
             Spacer(Modifier.weight(1f))
             Text("© OpenStreetMap contributors\nODbL 1.0", Modifier.padding(16.dp), style = MaterialTheme.typography.labelSmall)
         }
@@ -101,8 +120,8 @@ fun OfflineHomeContent(state: OfflineUiState, actions: OfflineActions = OfflineA
                 containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(56.dp).semantics { contentDescription = "Filters" }) { Icon(painterResource(R.drawable.ic_filter_list), contentDescription = null) }
         }) { padding ->
-            Column(Modifier.fillMaxSize().padding(padding)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.fillMaxSize().padding(padding).nestedScroll(dismissSearchOnScroll)) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { focus.clearFocus(); scope.launch { drawer.open() } }) { Icon(Icons.Default.Menu, "Choose page") }
                     if (state.page == OfflinePage.SETTINGS) Text("Settings", style = MaterialTheme.typography.titleMedium)
                     else {
@@ -118,7 +137,7 @@ fun OfflineHomeContent(state: OfflineUiState, actions: OfflineActions = OfflineA
                                 }
                             } else null,
                             singleLine = true, placeholder = { Text(if (state.page == OfflinePage.REGIONS) "Search regions" else if (state.page == OfflinePage.FAVORITES) "Search favorites" else "Search POIs", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium) },
-                            textStyle = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f),
+                            textStyle = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).height(52.dp),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
                         if (state.page == OfflinePage.REGIONS) IconButton(onClick = actions.refresh, enabled = !state.refreshing) {
                             Icon(Icons.Default.Refresh, "Refresh region list")
@@ -253,10 +272,16 @@ private fun ColumnScope.PoiList(state: OfflineUiState, actions: OfflineActions) 
             actions.more()
         }
     }
-    if (state.needsRegionDownload()) Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(if (state.installed.isEmpty()) "Download regions to use POIs offline." else "Download the region for your current location.",
-            Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-        TextButton(colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface), onClick = { actions.page(OfflinePage.REGIONS) }) { Text("Choose regions") }
+    if (state.needsRegionDownload()) Row(
+        Modifier.fillMaxWidth().clickable(role = Role.Button) { actions.page(OfflinePage.REGIONS) }
+            .semantics { contentDescription = "Choose regions" }
+            .heightIn(min = 48.dp).padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(if (state.installed.isEmpty()) "Download regions for POIs" else "Download this region",
+            Modifier.weight(1f, fill = false), style = MaterialTheme.typography.bodySmall,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null,
+            modifier = Modifier.padding(start = 8.dp).size(24.dp), tint = MaterialTheme.colorScheme.primary)
     }
     if (state.searching) LinearProgressIndicator(Modifier.fillMaxWidth())
     LazyColumn(Modifier.weight(1f).fillMaxWidth().testTag("poi-list"), state = listState, contentPadding = PaddingValues(bottom = 80.dp)) {
@@ -267,27 +292,43 @@ private fun ColumnScope.PoiList(state: OfflineUiState, actions: OfflineActions) 
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(end = 10.dp).size(24.dp))
                     Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
-                        Text(row.waypoint.name, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
-                        val distance = row.distanceMetres?.let { if (it < 1000) "${it.toInt()} m" else "${"%.1f".format(Locale.ROOT, it / 1000)} km" }
-                        val type = row.categories.firstOrNull()?.let(PoiTypes::label)?.takeUnless { it.equals(row.waypoint.name, ignoreCase = true) }
+                        val distance = row.distanceMetres?.let { if (it < 1000) "${it.toInt()}m" else "${"%.1f".format(Locale.ROOT, it / 1000)}km" }
+                        val type = row.categories.firstOrNull()?.let(PoiTypes::label) ?: "POI"
                         val address = row.waypoint.address.getFormatted().takeIf(String::isNotBlank)
-                        val coordinate = if (distance == null && address == null) "%.4f, %.4f".format(Locale.ROOT, row.waypoint.latitude, row.waypoint.longitude) else null
-                        Text(listOfNotNull(type, distance, address, coordinate).joinToString(" · "), style = MaterialTheme.typography.labelSmall,
-                            maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        val coordinate = "%.4f, %.4f".format(Locale.ROOT, row.waypoint.latitude, row.waypoint.longitude)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (distance != null) Text(
+                                distance,
+                                modifier = Modifier.background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                            )
+                            Text(row.waypoint.name, modifier = Modifier.weight(1f), maxLines = 2,
+                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Text(type, style = MaterialTheme.typography.labelSmall)
+                        Text(listOfNotNull(address, coordinate).joinToString(" · "), style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 IconButton(onClick = { actions.bookmark(row) }, modifier = Modifier.semantics { contentDescription = "Bookmark ${row.waypoint.name}" }) {
-                    Text(if (row.waypoint is Waypoint.Stored) "★" else "☆")
+                    Text(if (row.waypoint is Waypoint.Stored) "★" else "☆",
+                        color = if (row.waypoint is Waypoint.Stored) Color(0xFFFFD700) else MaterialTheme.colorScheme.onSurface)
                 }
             }
             HorizontalDivider()
         }
         if (state.rows.isEmpty() && !state.searching && state.ready) item {
             Column(Modifier.padding(12.dp)) {
-                Text(if (state.page == OfflinePage.FAVORITES) "No matching favorite POIs." else "No matching downloaded POIs.", style = MaterialTheme.typography.bodyMedium)
-                if (state.page == OfflinePage.FAVORITES) {
-                    TextButton(colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface), onClick = { actions.page(OfflinePage.POIS) }) { Text("Browse POIs") }
+                val filteredFavorites = state.poiQuery.isNotBlank() ||
+                    (state.types != PoiTypes.defaults && !state.types.containsAll(PoiTypes.labels.keys))
+                val message = when {
+                    state.page != OfflinePage.FAVORITES -> "No matching downloaded POIs."
+                    filteredFavorites -> "No matching favorite POIs."
+                    else -> "No favorites added yet."
                 }
+                Text(message, style = MaterialTheme.typography.bodyMedium)
             }
         }
         if (state.hasMore) item { TextButton(colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface), onClick = actions.more, enabled = !state.searching) { Text("Load more · ${state.total} matches") } }
