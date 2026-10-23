@@ -50,4 +50,35 @@ class AppUpdateSettingsTest {
         compose.onNodeWithText("Beta", substring = false).assertIsNotEnabled()
         compose.onNodeWithText("Checking…").assertIsNotEnabled()
     }
+    @Test fun bottomActionFollowsSelectedChannelDownloadAndInstallState() {
+        val release = AppRelease("0.99", 11, "v0.99-beta.1", "Notes", "https://example.invalid/a.apk", 3, "ab".repeat(32))
+        var state by mutableStateOf(UpdateUiState())
+        var checks = 0
+        var downloads = 0
+        var installs = 0
+        var cancels = 0
+        compose.setContent { AppTheme { AppUpdateSettingsContent(state,
+            check = { checks++ }, download = { downloads++ }, install = { installs++ },
+            cancel = { cancels++ }, canInstallUpdates = true) } }
+        compose.onNodeWithText("Check for updates").performClick()
+        compose.runOnIdle { assertEquals(1, checks); state = state.copy(channel = UpdateChannel.BETA, release = release) }
+        val action = compose.onNodeWithText("Download and install")
+        val bounds = action.fetchSemanticsNode().boundsInRoot
+        action.performClick()
+        compose.runOnIdle { assertEquals(1, downloads) }
+        compose.onNodeWithText("Download update").assertDoesNotExist()
+        compose.runOnIdle { state = state.copy(downloading = true, progress = 42) }
+        compose.onNodeWithText("Downloading… 42%").assertIsNotEnabled()
+        compose.onNodeWithText("Cancel download").performScrollTo()
+        // Scroll through the trailing padding so the fixed bottom action clears Cancel.
+        compose.onAllNodes(hasScrollAction()).onLast().performTouchInput { swipeUp() }
+        compose.onNodeWithText("Cancel download").performClick()
+        compose.runOnIdle { assertEquals(1, cancels); state = state.copy(downloading = false, apk = java.io.File("/unused/update.apk")) }
+        compose.onNodeWithText("Install update").assertIsDisplayed().performClick()
+        assertEquals(bounds, compose.onNodeWithText("Install update").fetchSemanticsNode().boundsInRoot)
+        compose.runOnIdle { assertEquals(1, installs); state = state.copy(channel = UpdateChannel.STABLE, release = null, apk = null) }
+        compose.onNodeWithText("Check for updates").assertIsDisplayed()
+        compose.onNodeWithText("Install update").assertDoesNotExist()
+    }
+
 }

@@ -11,7 +11,7 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppUpdateViewModelTest {
-    @Test fun offersNewVersionDownloadsAndRevalidatesBeforeInstall() = runTest {
+    @Test fun combinedDownloadRevalidatesAndOpensInstaller() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         val owner = ViewModelStore()
         val repository = mockk<AppUpdates>()
@@ -26,10 +26,10 @@ class AppUpdateViewModelTest {
             val vm = AppUpdateViewModel(repository); owner.put("updater", vm)
             advanceUntilIdle()
             assertEquals(release, vm.state.value.release)
-            vm.download(); advanceUntilIdle()
+            vm.downloadAndInstall(); advanceUntilIdle()
             assertEquals(file, vm.state.value.apk)
             val event = async { vm.installs.first() }
-            vm.install(); advanceUntilIdle()
+            advanceUntilIdle()
             assertEquals(file, event.await())
             coVerify(exactly = 1) { repository.verify(file, release) }
         } finally { owner.clear(); Dispatchers.resetMain() }
@@ -48,11 +48,11 @@ class AppUpdateViewModelTest {
             val vm = AppUpdateViewModel(repository); owner.put("updater", vm)
             advanceUntilIdle(); vm.channel(UpdateChannel.BETA); advanceUntilIdle()
             assertEquals(UpdateChannel.BETA, vm.state.value.channel)
-            vm.download(); advanceUntilIdle()
+            vm.downloadAndInstall(); advanceUntilIdle()
             assertFalse(vm.state.value.downloading)
             assertNull(vm.state.value.apk)
             assertTrue(vm.state.value.message!!.contains("offline"))
-            vm.download(); advanceUntilIdle()
+            vm.downloadAndInstall(); advanceUntilIdle()
             coVerify(exactly = 2) { repository.download(any(), any()) }
         } finally { owner.clear(); Dispatchers.resetMain() }
     }
@@ -67,7 +67,7 @@ class AppUpdateViewModelTest {
         coEvery { repository.download(any(), any()) } coAnswers { awaitCancellation() }
         try {
             val vm = AppUpdateViewModel(repository); owner.put("updater", vm)
-            advanceUntilIdle(); vm.download(); runCurrent()
+            advanceUntilIdle(); vm.downloadAndInstall(); runCurrent()
             assertTrue(vm.state.value.downloading)
             vm.cancel(); advanceUntilIdle()
             assertFalse(vm.state.value.downloading)

@@ -528,3 +528,35 @@ Candidate APK SHA-256: b3121725cc679fbc54c339432d01d760eba1bd1075b34a9733e767cff
 Source commit, checksum and test details accompany the beta in build-info.json
 and SHA256SUMS. Real Karoo acceptance remains pending; stable 0.96 is unchanged.
 No physical device was installed and the legacy release workflow was not used.
+
+## Settings available-update action (unreleased 0.98 / 10)
+
+All 47 normal-ID debug JVM tests, three AppUpdateSettingsTest API 35 emulator
+cases, and debug lint passed. ViewModel coverage exercises combined download,
+revalidation and automatic installer-event delivery, failed-download retry and
+cancellation without installation. Screen coverage verifies check/download/install
+callbacks, busy progress, cancellation and reverting to Check for updates when a
+channel has no candidate. Initial screen cancellation assertion tapped behind
+the floating action; the test now scrolls through trailing padding to expose it.
+The final rerun passed. The local-ID APK was built and emulator refreshed.
+
+Production APK installation remains disabled for local-ID builds. UI tests inject
+installation availability and fake callbacks, without opening a real installer.
+Physical Karoo behavior remains untested; published 0.97 Beta 1 is unchanged.
+The release-notes documentation move is preserved in this branch; no commit,
+push or new publication was performed for this batch.
+
+## Local 0.98 Beta 1 package (2026-10-23)
+
+Prepared app/build/beta/v0.98-beta.1/ with seven upload artifacts, copyable
+GitHub title/description and publication/promotion instructions. All 47 debug
+and 47 release JVM tests, release lint, signed optimized assembly and three
+Settings emulator tests passed. Package/version, established certificate and
+candidate-specific manifest/APK/icon URLs verified. Full emulator suite and
+physical device installation were not rerun for this candidate.
+
+APK SHA-256: d5269795d21fe38a695716c069ee6422b97632407c708cc05a4c1d006209b49b.
+Source is uncommitted: build-info.json intentionally has sourceCommit null and
+sourceState uncommitted. Local finalize.py verifies the prepared source snapshot
+and artifact checksums, then records the clean commit after source is committed,
+without changing APK bytes. No commit/tag/push/upload/publication performed.

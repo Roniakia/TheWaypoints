@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.97 Beta 1: Compact yellow distance labels beside POI names, separate type/address/coordinates, natural street and city addresses, gold saved stars and clearer Favorites empty states. Search fields have margins; scrolling dismisses the keyboard. Sidebar selection is bright yellow with boxier items. Region guidance is a full-width clickable row with an inline arrow; disabled bottom buttons are opaque. Existing favorites and downloaded packs are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.98 Beta 1: Settings uses one floating action: Check for updates when current, Download and install when the selected channel offers an update, and Install update for an already verified APK. Downloads are verified before Android installation confirmation; retry and cancellation remain available. Release history moves to RELEASE_NOTES.md. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

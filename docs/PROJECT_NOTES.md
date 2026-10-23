@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.97`, code `9` in `gradle.properties`; stable is 0.96 (8) |
+| Development version | `0.98`, code `10` in `gradle.properties`; stable is 0.96 (8) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -182,7 +182,8 @@ Karoo 2 at 480×800 pixels / 295 dpi.
 
 `assembleRelease` finalizes tasks generating the external Karoo manifest and
 copying an icon under `app/build/outputs/apk/release/assets/`; description comes
-from the README. README release notes describe stable 0.94 and retain historical notes.
+from the README description. Versioned changelogs live in `RELEASE_NOTES.md`;
+the README links to that file. Historical entries are preserved.
 
 Both GitHub workflows are manual (`workflow_dispatch`), run variant-specific
 unit tests, and publish release assets. Instrumentation is not active there.
@@ -490,3 +491,25 @@ candidate-specific update URLs. Changes are confined to POI/address presentation
 and UI refinements; no dependency/storage/data-pack change is included. Stable
 0.96 remains unchanged and real Karoo acceptance is pending. Candidate identity
 is recorded in release build-info.json/SHA256SUMS and LOCAL_TESTING.md.
+
+## Release notes location
+
+Version history moved intact from README.md to root RELEASE_NOTES.md. README
+links to that file and AGENTS.md points changelog maintenance there. This is a
+documentation-only change; app version and published beta assets are unchanged.
+
+## Settings update action (unreleased 0.98 / 10)
+
+The shared floating action checks when no release is offered, downloads and opens
+Android installation for an available release, and retries installation for an
+already verified APK. The separate inline download/install buttons are removed.
+Download progress disables the same action; cancellation remains in the scroll
+content. Channel changes still clear the previous candidate before checking.
+Local-ID production installation remains blocked; candidate 0.97 is unchanged.
+
+## Manual beta delivery
+
+Prepare beta means local packaging under app/build/beta/<tag>/ with upload/
+artifacts, copyable GITHUB_RELEASE.md, and publication/promotion instructions.
+No automatic GitHub tagging/upload/publication. Record uncommitted source honestly
+and finalize provenance after commit. See RELEASING.md.
