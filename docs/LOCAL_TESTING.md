@@ -434,3 +434,129 @@ release metadata only and retains its exact APK, signing identity, version/code,
 tag and source commit. No rebuild or test rerun is needed for promotion. The
 original 47 debug/47 release JVM and 35-pass/four-skip emulator results remain
 the recorded local checks. Real-device model/KOS were not specified.
+
+## POI distance labels (0.97 / 9, unreleased)
+
+All 47 debug JVM tests, debug lint and debug APK assembly passed on 2026-10-23.
+POI/Favorites distances now use a separate Karoo yellow badge with compact metric
+formatting. Emulator instrumentation and visual inspection were not performed;
+the sandbox blocked the attempted ADB server startup. No physical Karoo install,
+commit, push or publishing occurred.
+
+Emulator follow-up: launched the API 35 emulator and built/installed the isolated
+local-ID app. The existing POI filter/list screen test passed with sample distances;
+its captured light-theme screen was visually inspected for yellow distance badges.
+The real app remains open, but stock Android cannot supply Karoo GPS distances.
+The Gradle connected-test runner removed the local-ID app/data after its run;
+the app was reinstalled for the retained screenshot run. The signed normal-ID app
+was not changed.
+
+## Search margins, selected stars and scroll keyboard (0.97 / 9)
+
+Search capsules are 52 dp high within 8 dp header margins. All five OfflineHomeTest
+emulator cases and debug lint passed; the header was visually inspected. The
+normal-ID 47-test JVM suite passed. An initial local-ID JVM invocation failed
+three updater tests at the intentional production-download guard; normal-ID is
+the appropriate variant for those tests.
+
+After adding gold saved stars and scroll focus dismissal, all five emulator
+screen cases and debug lint passed again. The paging regression now taps search,
+swipes the list, asserts focus is cleared, and taps search to regain focus.
+The updated isolated app was reinstalled/opened on the visible emulator. No
+physical device installation, commit or publication occurred. Version stays 0.97/9.
+
+## Region guidance arrow and opaque disabled bottom actions (0.97 / 9)
+
+All 47 normal-ID debug JVM tests, seven local-ID emulator screen tests
+(OfflineHomeTest and AppUpdateSettingsTest), and debug lint passed. The local
+APK was rebuilt by instrumentation and the visible emulator refreshed. The shared
+disabled capsule now uses an opaque composited gray; its surrounding fade and
+scroll clearance are unchanged. Region guidance retains its accessible label
+with a yellow forward arrow. No physical Karoo testing or publication occurred.
+
+## Boxier sidebar (0.97 / 9)
+
+All five OfflineHomeTest emulator tests and debug lint passed. Reinstalled the
+local-ID app, opened its drawer and inspected a fresh 480×800 screenshot: the
+selected POIs row has yellow fill, black text, modest corners and clear side
+margins. The emulator is left with the drawer open. Version remains 0.97/9;
+no physical device install, commit or publication occurred.
+
+Guidance copy follow-up: local debug assembly passed. Refreshed the emulator and
+visually confirmed Download regions for POIs fits on one line beside the yellow
+arrow at 480×800. Both guidance variants use one line with ellipsis fallback.
+No test rerun was needed for this copy/layout-only change; version stays 0.97/9.
+
+Full-width region guidance follow-up: all six OfflineHomeTest emulator cases
+and debug lint passed. New coverage checks the row spans the root width and
+that tapping its far right edge opens Regions. Arrow now sits 8 dp after the
+text; the single clickable row retains the Choose regions accessibility label.
+The visible emulator was refreshed. Version remains 0.97/9.
+
+Favorites empty-state follow-up: all six OfflineHomeTest emulator cases and
+debug lint passed. Favorites coverage now checks default/all categories with
+blank search, entered/cleared search, restricted/empty category sets, and absence
+of Browse POIs. The emulator app was refreshed. Version remains 0.97/9.
+
+POI text layout follow-up: all seven OfflineHomeTest emulator tests and debug
+lint passed. New coverage verifies distance before the name, type below the
+name, address · coordinates below the type, and coordinates without an address
+or known distance. A retained focused run passed for screenshot inspection;
+480×800 rendering confirms the layout, with detail wrapping on narrow rows.
+The updated app is open in the emulator. Version remains 0.97/9.
+
+Natural address formatting follow-up: all 47 normal-ID JVM tests, the focused
+POI text layout emulator test, and debug lint passed. The screen test now checks
+street + house number, city · coordinates while supplying an SE country code,
+and still checks the no-address coordinate fallback. The updated local app was
+opened on the emulator. Version remains 0.97/9; stored data/pack format unchanged.
+
+## 0.97 Beta 1 candidate verification (2026-10-23)
+
+For v0.97-beta.1 (0.97/code 9), all 47 debug and 47 release JVM tests passed,
+along with release lint and optimized signed assembly. The full API 35 local-ID
+suite XML reports 41 tests: 37 passed, four optional live/fixture cases skipped,
+zero failures/errors. The skipped cases cover public download, real Skåne fixture,
+live launch/download and higher-version installer confirmation. The Gradle console
+reported 45 including repeated skip notifications; XML is the count used here.
+The exact signed beta upgraded/launched the existing production-ID emulator app.
+
+APK package/version and candidate-specific MANIFEST_URL match the generated
+manifest APK/icon URLs. Signature matches the established SHA-256 certificate
+ce73d47787626c776d4d578d62c98a7de4eb814bf5b701a58679df8ffdb002f6.
+Candidate APK SHA-256: b3121725cc679fbc54c339432d01d760eba1bd1075b34a9733e767cff302c8d1.
+Source commit, checksum and test details accompany the beta in build-info.json
+and SHA256SUMS. Real Karoo acceptance remains pending; stable 0.96 is unchanged.
+No physical device was installed and the legacy release workflow was not used.
+
+## Settings available-update action (unreleased 0.98 / 10)
+
+All 47 normal-ID debug JVM tests, three AppUpdateSettingsTest API 35 emulator
+cases, and debug lint passed. ViewModel coverage exercises combined download,
+revalidation and automatic installer-event delivery, failed-download retry and
+cancellation without installation. Screen coverage verifies check/download/install
+callbacks, busy progress, cancellation and reverting to Check for updates when a
+channel has no candidate. Initial screen cancellation assertion tapped behind
+the floating action; the test now scrolls through trailing padding to expose it.
+The final rerun passed. The local-ID APK was built and emulator refreshed.
+
+Production APK installation remains disabled for local-ID builds. UI tests inject
+installation availability and fake callbacks, without opening a real installer.
+Physical Karoo behavior remains untested; published 0.97 Beta 1 is unchanged.
+The release-notes documentation move is preserved in this branch; no commit,
+push or new publication was performed for this batch.
+
+## Local 0.98 Beta 1 package (2026-10-23)
+
+Prepared app/build/beta/v0.98-beta.1/ with seven upload artifacts, copyable
+GitHub title/description and publication/promotion instructions. All 47 debug
+and 47 release JVM tests, release lint, signed optimized assembly and three
+Settings emulator tests passed. Package/version, established certificate and
+candidate-specific manifest/APK/icon URLs verified. Full emulator suite and
+physical device installation were not rerun for this candidate.
+
+APK SHA-256: d5269795d21fe38a695716c069ee6422b97632407c708cc05a4c1d006209b49b.
+Source is uncommitted: build-info.json intentionally has sourceCommit null and
+sourceState uncommitted. Local finalize.py verifies the prepared source snapshot
+and artifact checksums, then records the clean commit after source is committed,
+without changing APK bytes. No commit/tag/push/upload/publication performed.

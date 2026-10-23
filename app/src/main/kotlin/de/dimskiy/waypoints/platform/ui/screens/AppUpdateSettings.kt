@@ -50,16 +50,30 @@ fun AppUpdateSettings(viewModel: AppUpdateViewModel) {
             }
         }
     }
-    AppUpdateSettingsContent(state, viewModel::channel, { viewModel.check() }, viewModel::download,
+    AppUpdateSettingsContent(state, viewModel::channel, { viewModel.check() }, viewModel::downloadAndInstall,
         viewModel::cancel, viewModel::install)
 }
 
 @Composable
 fun AppUpdateSettingsContent(state: UpdateUiState, channel: (UpdateChannel) -> Unit = {},
-    check: () -> Unit = {}, download: () -> Unit = {}, cancel: () -> Unit = {}, install: () -> Unit = {}) {
+    check: () -> Unit = {}, download: () -> Unit = {}, cancel: () -> Unit = {}, install: () -> Unit = {},
+    canInstallUpdates: Boolean = !BuildConfig.APPLICATION_ID.endsWith(".local")) {
     val busy = state.checking || state.downloading
-    FloatingBottomAction(label = if (state.checking) "Checking…" else "Check for updates",
-        onClick = check, enabled = !busy) { scrollPadding ->
+    val actionLabel = when {
+        state.checking -> "Checking…"
+        state.downloading -> "Downloading… ${state.progress}%"
+        state.release == null -> "Check for updates"
+        state.apk != null -> "Install update"
+        else -> "Download and install"
+    }
+    FloatingBottomAction(label = actionLabel,
+        onClick = {
+            when {
+                state.release == null -> check()
+                state.apk != null -> install()
+                else -> download()
+            }
+        }, enabled = !busy && (state.release == null || canInstallUpdates)) { scrollPadding ->
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(scrollPadding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("App updates", style = MaterialTheme.typography.titleMedium)
             Text("Installed: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", style = MaterialTheme.typography.bodySmall)
@@ -85,12 +99,8 @@ fun AppUpdateSettingsContent(state: UpdateUiState, channel: (UpdateChannel) -> U
                 Text("Version ${release.version} · ${release.tag}", style = MaterialTheme.typography.titleSmall)
                 Text("%.1f MB".format(release.bytes / 1_000_000.0), style = MaterialTheme.typography.bodySmall)
                 if (release.notes.isNotBlank()) Text(release.notes, style = MaterialTheme.typography.bodySmall)
-                if (BuildConfig.APPLICATION_ID.endsWith(".local")) {
+                if (!canInstallUpdates) {
                     Text("Local test build: production updates cannot be installed over this app.", style = MaterialTheme.typography.bodySmall)
-                } else if (state.apk != null) {
-                    Button(onClick = install, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Install update") }
-                } else {
-                    Button(onClick = download, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Download update") }
                 }
                 if (state.downloading) {
                     LinearProgressIndicator(progress = { state.progress / 100f }, modifier = Modifier.fillMaxWidth())

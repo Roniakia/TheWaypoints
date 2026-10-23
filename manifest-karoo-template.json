@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.96: TheWaypoints branding, pack-only POI search, Favorites with filters, category icons, rounded clearable search, automatic paging and refined region downloads. Settings adds Stable/Beta update channels and verified APK downloads with system installation confirmation. Existing bookmarks and downloaded packs are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.98 Beta 1: Settings uses one floating action: Check for updates when current, Download and install when the selected channel offers an update, and Install update for an already verified APK. Downloads are verified before Android installation confirmation; retry and cancellation remain available. Release history moves to RELEASE_NOTES.md. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

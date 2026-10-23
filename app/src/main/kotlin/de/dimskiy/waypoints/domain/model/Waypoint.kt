@@ -39,15 +39,13 @@ sealed class Waypoint {
             .joinToString(prefix = "#", separator = " #")
 
         fun getFormatted(): String {
-            val countryAndCity = listOfNotNull(country, city)
-                .takeIf(List<*>::isNotEmpty)
-                ?.joinToString(prefix = "[", postfix = "]", separator = ": ")
-
             val streetAndNumber = listOfNotNull(street, house)
+                .map(String::trim).filter(String::isNotEmpty)
                 .joinToString("\u00A0")
 
-            return listOfNotNull(countryAndCity, streetAndNumber)
-                .joinToString(separator = " ")
+            return listOfNotNull(streetAndNumber, city)
+                .map(String::trim).filter(String::isNotEmpty)
+                .joinToString(", ")
         }
     }
 }

@@ -52,7 +52,9 @@ class AppUpdateViewModel @Inject constructor(private val updates: AppUpdates) : 
             check()
         }
     }
-    fun download() {
+    fun download() = download(installWhenReady = false)
+    fun downloadAndInstall() = download(installWhenReady = true)
+    private fun download(installWhenReady: Boolean) {
         if (work?.isActive == true) return
         val release = mutable.value.release ?: return
         work = viewModelScope.launch {
@@ -60,6 +62,7 @@ class AppUpdateViewModel @Inject constructor(private val updates: AppUpdates) : 
             try {
                 val file = updates.download(release) { progress -> mutable.update { it.copy(progress = progress) } }
                 mutable.update { it.copy(downloading = false, apk = file, message = "Download verified. Ready to install.") }
+                if (installWhenReady) install()
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (failure: Exception) { mutable.update { it.copy(downloading = false, message = "Download failed. ${failure.message.orEmpty()}") } }
         }

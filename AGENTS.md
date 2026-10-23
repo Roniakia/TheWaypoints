@@ -42,7 +42,7 @@ Do not run it as a build verification shortcut.
   integration remain authorized core functionality.
 - Use the personal `waypoints-versioning` skill for functional, dependency, and
   build changes. Bump once per cohesive unreleased batch, reuse an existing bump
-  during follow-ups, and keep README release notes and project notes coherent.
+  during follow-ups, and keep RELEASE_NOTES.md and project notes coherent.
   Documentation-only changes do not require an app bump. This authorizes no
   commit, push, release, or physical device installation.
 
@@ -54,7 +54,7 @@ Do not run it as a build verification shortcut.
   previous release: features, fixes, dependency/build changes, removals, and any
   compatibility or migration requirements that apply. Describe user impact;
   avoid generic messages such as "updates" or a raw list of commit subjects.
-- Keep README release notes and published release notes consistent with the
+- Keep RELEASE_NOTES.md and published release notes consistent with the
   actual diff and verified results. Preserve previous changelog entries.
 - These requirements do not authorize committing or publishing.
 
@@ -78,6 +78,26 @@ Do not run it as a build verification shortcut.
   changelog, and the user's acceptance so the tested candidate is unambiguous.
 - All source/version changes go through PRs to protected `main`, including release
   preparation. The old direct-push release workflow needs adaptation before use.
+
+# Local beta preparation and manual publication
+
+- When asked to prepare a beta, prepare files locally under
+  `app/build/beta/<tag>/`. Do not create/push Git tags, upload assets, publish a
+  GitHub release, or use a browser to publish unless separately requested.
+- Put only uploadable public artifacts in `upload/`: versioned signed APK,
+  `manifest-karoo.json`, `app_icon.webp`, `build-info.json`, `SHA256SUMS`, and
+  release notes/device-test steps. Keep signing keys/passwords and local paths out.
+- Supply `GITHUB_RELEASE.md` beside `upload/`, with an exact release title and
+  copyable description, plus local instructions for publication and promotion.
+- Verify version/code, candidate-specific URLs, established signing certificate,
+  and APK SHA-256. Record actual tests and skipped/blocked checks.
+- If source is uncommitted, label it explicitly and provide a local finalization
+  step that records the committed source and refreshes checksums without changing
+  the APK. Do not claim the base commit contains uncommitted candidate changes.
+- Publish as a prerelease from the candidate's exact source commit/tag. Keep
+  stable/latest unchanged. Stable promotion after explicit device acceptance
+  reuses the exact beta release/tag/APK; never rebuild or move its tag.
+- See `docs/RELEASING.md` for the manual GitHub steps.
 
 # Floating bottom action buttons
 
