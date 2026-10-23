@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.98`, code `10` in `gradle.properties`; stable is 0.96 (8) |
+| Development version | `0.99`, code `11` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -175,8 +175,8 @@ are under `app/schemas/`. Preferences file is `location_settings`.
 ## Integration and delivery
 
 Manifest declares a launcher activity, INTERNET permission, extension metadata,
-and this repository's release manifest URL; it does not declare a custom
-`KarooExtension` service for ride data fields. UI resources include English,
+and this repository's release manifest URL; it declares `PoiFieldExtension`, a custom
+`KarooExtension` service for the graphical Nearest POI and Selected POI ride data fields. UI resources include English,
 German, Spanish, French, and Italian strings. Preview configuration targets
 Karoo 2 at 480×800 pixels / 295 dpi.
 
@@ -513,3 +513,64 @@ Prepare beta means local packaging under app/build/beta/<tag>/ with upload/
 artifacts, copyable GITHUB_RELEASE.md, and publication/promotion instructions.
 No automatic GitHub tagging/upload/publication. Record uncommitted source honestly
 and finalize provenance after commit. See RELEASING.md.
+
+## Nearest POI ride field (unreleased 0.99 / 11)
+
+Feature branch: codex/karoo-poi-field in an isolated managed worktree. Existing
+uncommitted stable-release documentation in the original checkout is preserved.
+The exported KarooExtension service registers two graphical DataTypes using the
+existing extension ID. RemoteViews hides the standard header and centers a small
+map pin above a category icon and distance, designed for one profile cell.
+Karoo profile layout controls the actual field allocation; larger cells also work.
+
+A field view owns a separate Karoo connection and location consumer, removed on
+emitter cancellation. Searches run on the injected IO dispatcher every five
+seconds and use the existing region-pack store with cancellation checks. All
+downloaded categories participate, independently of app filters; Favorites do not.
+Distance uses metric straight-line formatting, consistent with the offline list.
+No GPS fix within 30 seconds shows No GPS; missing/empty packs show No POIs.
+The editor preview does not connect to Karoo or open packs. Whole-cell PendingIntent
+uses CLEAR_TOP to recreate MainActivity and explicitly select POIs, including when
+the app was previously on Settings/Favorites/Regions. No Room/dependency changes.
+
+The current nearest search scans installed POIs; five-second polling should be
+benchmarked with large multi-region datasets on hardware. Stock Android cannot
+validate Karoo ride-cell sizing, service binding, live fixes or in-ride launching.
+
+### Selected POI follow-up (same 0.99 / 11 batch)
+
+SelectedPoiRepository stores a destination snapshot (name, coordinates, categories,
+unique selection token) in the existing DataStore. POI/Favorite taps persist this
+selection before launching the native map; a map-service timeout retains it.
+No Room schema changes. It remains independent of pack removal or unbookmarking.
+The selected field uses the same single-cell layout and POIs launch action, with
+Select POI for an empty target and its category icon plus No GPS without a fresh
+fix. The nearest field remains independent of the selected destination.
+
+Arrival confirmation requires two different location-event timestamps within
+50 metres, checked on the field's five-second refresh. Reusing a cached fix
+cannot confirm arrival. An outside/missing/stale fix resets confirmation. A new
+selection token resets confirmation even for the same coordinates. Clearing is
+an atomic DataStore comparison against that token, preserving a later selection.
+Monitoring runs while the selected field view is active; it does not add an
+always-on background location service. Passing the destination while the field
+is inactive is not recorded. Real-device GPS/arrival behavior remains unverified.
+
+Validation: all 58 debug JVM tests, 12 focused API 35 emulator tests, debug lint
+and debug assembly passed. The 160x100 RemoteViews preview was visually inspected.
+Details and real-device beta scenarios are recorded in LOCAL_TESTING.md. No
+commit, publication or physical device installation occurred.
+
+## 0.99 Beta 1 candidate preparation (2026-10-23)
+
+For v0.99-beta.1, all 58 release JVM tests passed, along with release lint and
+optimized signed assembly. The earlier 58 debug JVM and 12 focused local-ID
+API 35 emulator tests also passed. Full emulator instrumentation was not rerun;
+stock Android does not exercise live Karoo ride-screen binding or arrival fixes.
+Version 0.99/code 11 uses the established signing identity and immutable candidate
+URLs. Public package metadata, certificate and SHA-256 are verified before upload
+and recorded with the exact source commit in the beta build-info.json.
+
+Source/version preparation goes through a PR to main. The beta is published from
+its exact feature commit; stable 0.98 remains unchanged. Real Karoo acceptance is
+pending. No physical device installation or legacy release workflow is used.

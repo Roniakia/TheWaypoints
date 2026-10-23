@@ -39,6 +39,7 @@ class OfflineViewModel @Inject constructor(
     private val locations: LocationsProvider, private val openMap: OpenExternalMap,
     private val preferences: DataStore<Preferences>,
     @BaseModule.DispatcherIO private val io: CoroutineDispatcher,
+    private val selectedPoi: SelectedPoiRepository,
 ) : ViewModel() {
     private val mutable = MutableStateFlow(OfflineUiState())
     val state = mutable.asStateFlow()
@@ -208,7 +209,11 @@ class OfflineViewModel @Inject constructor(
         } catch (failure: Exception) { report(failure) }
     }
     fun open(row: OfflineRow) = viewModelScope.launch {
-        try { withTimeout(15_000) { openMap(row.waypoint) } }
+        try {
+            selectedPoi.select(row.waypoint.name,
+                PoiPosition(row.waypoint.latitude, row.waypoint.longitude), row.categories)
+            withTimeout(15_000) { openMap(row.waypoint) }
+        }
         catch (cancelled: TimeoutCancellationException) { mutable.update { it.copy(message = "Karoo map service is unavailable.") } }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { report(failure) }

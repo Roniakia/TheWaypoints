@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.98 Beta 1: Settings uses one floating action: Check for updates when current, Download and install when the selected channel offers an update, and Install update for an already verified APK. Downloads are verified before Android installation confirmation; retry and cancellation remain available. Release history moves to RELEASE_NOTES.md. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.99 Beta 1: Add compact Nearest POI and Selected POI Karoo ride fields. Tap a POI or Favorite to select it for the field and open the native Karoo map. Selected destinations survive restarts and clear after two fresh GPS fixes within 50m while the field is active. Tap either field to open POIs. Metric straight-line distances; live ride binding and arrival behavior need Karoo testing. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

@@ -1,5 +1,24 @@
 # Release notes
 
+### v0.99 — Beta 1, 2026-10-23
+
+Version 0.99 (code 11), candidate `v0.99-beta.1`; real Karoo acceptance pending.
+
+- Add the Nearest POI Karoo ride data field, designed for a single cell: a small
+  pin above the nearest downloaded POI category icon and compact metric distance.
+- Add a separate Selected POI field. Tapping a POI or Favorite saves it as the
+  destination and opens the native Karoo map. The selection survives restarts
+  and region removal; selecting another POI replaces it.
+- Automatically clear the selected destination after two distinct fresh GPS
+  fixes within 50 metres while the field is active. An old arrival check cannot
+  clear a replacement selection. An empty field says Select POI.
+- Tap either field to open the app on POIs. The profile editor shows a sample; the
+  live field reports missing GPS or POIs and clears GPS older than 30 seconds.
+- Uses all downloaded categories independently of app filters; distances are
+  straight-line, refreshed every five seconds while visible, with no network
+  requests. Nearest POI excludes Favorites; Selected POI supports them. Version
+  0.99/code 11.
+
 ### v0.98 — unreleased (Beta 1 prepared locally)
 
 - Settings replaces Check for updates with Download and install when the chosen

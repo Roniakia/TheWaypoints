@@ -61,8 +61,9 @@ data class OfflineActions(
 )
 
 @Composable
-fun OfflineHome(viewModel: OfflineViewModel = hiltViewModel(), updates: AppUpdateViewModel = hiltViewModel()) {
+fun OfflineHome(viewModel: OfflineViewModel = hiltViewModel(), updates: AppUpdateViewModel = hiltViewModel(), openPois: Boolean = false) {
     val updateState by updates.state.collectAsState()
+    LaunchedEffect(openPois) { if (openPois) viewModel.page(OfflinePage.POIS) }
     val state by viewModel.state.collectAsState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(lifecycle) {

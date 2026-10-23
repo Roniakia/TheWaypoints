@@ -31,8 +31,10 @@ class OfflineFavoritesTest {
             every { downloads.observe() } returns emptyFlow()
             val preferences = mockk<DataStore<Preferences>>()
             every { preferences.data } returns emptyFlow()
+            val target = mockk<SelectedPoiRepository>(relaxed = true)
+            val map = mockk<de.dimskiy.waypoints.domain.cases.OpenExternalMap>(relaxed = true)
             val vm = OfflineViewModel(catalogue, Provider { store }, downloads, bookmarks,
-                mockk(), mockk(), preferences, StandardTestDispatcher(testScheduler))
+                mockk(), map, preferences, StandardTestDispatcher(testScheduler), target)
             owner.put("favorites", vm)
             runCurrent()
             vm.page(OfflinePage.FAVORITES)
@@ -61,6 +63,13 @@ class OfflineFavoritesTest {
             assertEquals("Water 55", vm.state.value.poiQuery)
             assertEquals(setOf("water.drinking_water"), vm.state.value.types)
             assertEquals(PoiSort.NAME, vm.state.value.sort)
+            val row = OfflineRow(saved.value.first(), setOf("water.drinking_water"), 100.0)
+            vm.open(row)
+            advanceUntilIdle()
+            coVerifyOrder {
+                target.select(row.waypoint.name, PoiPosition(row.waypoint.latitude, row.waypoint.longitude), row.categories)
+                map(row.waypoint)
+            }
             verify(exactly = 0) { store.search(any(), any()) }
         } finally {
             owner.clear()

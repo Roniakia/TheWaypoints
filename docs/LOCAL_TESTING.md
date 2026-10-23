@@ -560,3 +560,50 @@ Source is uncommitted: build-info.json intentionally has sourceCommit null and
 sourceState uncommitted. Local finalize.py verifies the prepared source snapshot
 and artifact checksums, then records the clean commit after source is committed,
 without changing APK bytes. No commit/tag/push/upload/publication performed.
+
+## Karoo POI ride fields (unreleased 0.99 / 11, 2026-10-23)
+
+All 58 normal-ID debug JVM tests passed. New coverage verifies metric distance
+formatting, persistent selected-target snapshots across DataStore reopen, safe
+conditional clearing after replacement/reselection, corrupt selection fallback,
+arrival radius/distinct-fix/reset behavior, date-line distance, and selection
+before the native-map call. No Room schema change or migration was needed.
+
+All 12 focused API 35 local-ID emulator tests passed: five PoiFieldTest cases
+and seven OfflineHomeTest cases. Field checks cover exported service discovery,
+small-cell RemoteViews preview without reading packs, the actual PendingIntent
+launch action, selected preview without target reads, empty/No GPS target states,
+pack independence and stopping refresh on cancellation. The preview was rendered
+at 160x100 pixels and visually inspected: small pin above category icon + 250m.
+Distance text scales to the configured width. These tests use stock Android,
+not Karoo ride UI or live Karoo location events.
+
+Final normal-ID debug lint and assembly passed. An initial build caught stale
+candidate-tag metadata after the app bump, then compilation caught the public
+list exposing an internal field type; both were corrected. Initial lint caught
+missing translations; field labels/descriptions now cover existing app locales.
+Final checks have no failures. No full emulator suite, signed release build,
+physical Karoo test, commit, push, tag or publication was performed.
+
+Arrival confirmation runs while the selected field is active: two distinct fresh
+fixes within 50m; stale/outside/missing fixes reset it. Actual ride-screen binding,
+smallest-cell sizing, GPS/arrival behavior and in-ride app launch require hardware
+validation. Large-pack search polling also needs a device performance check.
+Suggested beta checks: add both fields to single cells; compare nearest distance;
+tap a POI/Favorite and verify Selected POI changes; restart app; approach the target
+and verify it clears; select a new target during arrival; test GPS loss and pack
+removal. Beta preparation/publication requires the user's next authorization.
+
+## 0.99 Beta 1 candidate preparation (2026-10-23)
+
+For v0.99-beta.1, all 58 release JVM tests passed, along with release lint and
+optimized signed assembly. The earlier 58 debug JVM and 12 focused local-ID
+API 35 emulator tests also passed. Full emulator instrumentation was not rerun;
+stock Android does not exercise live Karoo ride-screen binding or arrival fixes.
+Version 0.99/code 11 uses the established signing identity and immutable candidate
+URLs. Public package metadata, certificate and SHA-256 are verified before upload
+and recorded with the exact source commit in the beta build-info.json.
+
+Source/version preparation goes through a PR to main. The beta is published from
+its exact feature commit; stable 0.98 remains unchanged. Real Karoo acceptance is
+pending. No physical device installation or legacy release workflow is used.

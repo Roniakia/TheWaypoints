@@ -24,6 +24,12 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".platform.karooservices.PoiFieldExtension" android:exported="true">
+            <intent-filter><action android:name="io.hammerhead.karooext.KAROO_EXTENSION" /></intent-filter>
+            <meta-data android:name="io.hammerhead.karooext.EXTENSION_INFO"
+                android:resource="@xml/karoo_extension_info" />
+        </service>
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
