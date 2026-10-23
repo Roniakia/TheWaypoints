@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.99`, code `11` in `gradle.properties`; stable is 0.98 (10) |
+| Development version | `0.99`, code `12` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -574,3 +574,60 @@ and recorded with the exact source commit in the beta build-info.json.
 Source/version preparation goes through a PR to main. The beta is published from
 its exact feature commit; stable 0.98 remains unchanged. Real Karoo acceptance is
 pending. No physical device installation or legacy release workflow is used.
+
+## Beta 1 device feedback and native fields (0.99 Beta 2 / code 12, unreleased)
+
+The user tested Beta 1 on a Karoo 3 with their latest OS and reported that live
+ride taps did not open the app, the graphical field used two cells, and no GPS
+was available near a window. An exact KOS build was not supplied. Beta 1 is not
+accepted for stable promotion. Its tag/APK remain immutable.
+
+The user chose native one-cell distance fields with an Open POIs controller
+action instead of the custom icon layout. Both existing type IDs are retained
+but registered graphical=false. startStream emits FIELD_SINGLE in metres;
+startView configures native DISTANCE formatting and explicit missing-data messages.
+Karoo handles metric/imperial presentation, headers and cell sizing. Custom
+RemoteViews and their tap action are removed. The pinned SDK declares custom
+views graphical and exposes no minimum-width attribute. Actual native cell
+placement remains a firmware/device check; the Android emulator cannot prove it.
+
+Open POIs is a BonusAction routed by the extension to MainActivity's POIs intent.
+It is a controller binding, not a tap handler on a native numeric field. Users
+may need to remove/re-add old fields after upgrading to refresh their host layout.
+The editor uses Karoo's own numeric sample treatment rather than our old preview.
+
+GPS collection has an independently cancellable connection per native stream.
+Missing/disconnected/stale (>30s) GPS yields No GPS; nearest searches need packs,
+and no selected target yields Select POI without GPS or any pack read. Exceptions
+are locally logged and do not fabricate a location or zero distance. No permission
+or external location fallback is added. Selecting a destination from POIs/Favorites
+still persists before native-map launch, independently of a GPS fix.
+
+Arrival monitoring follows the native stream subscription, rather than a graphical
+view. It only observes fixes while that stream is subscribed; no always-on location
+service is added. Shared messages between the native view and stream are StateFlow.
+The Open POIs controller action and native cell allocation need hardware retesting.
+
+References: pinned DataTypeImpl, ViewEvent and official sample Extension BonusAction
+implementation in hammerheadnav/karoo-ext 1.1.9. Native editor sample limitations are
+tracked in SDK issue #93. The prior preview-click emulator test is replaced by
+native stream/lifecycle and controller-intent coverage; it did not establish that
+Beta 1’s ride-screen tap worked. No dependency or Room schema changes.
+
+Native-field correction validation: 62 debug JVM tests, 11 focused API 35 emulator
+tests, debug lint and debug assembly passed. Changes remain local and uncommitted;
+Beta 2 is not published. Karoo retest instructions are in LOCAL_TESTING.md.
+
+## 0.99 Beta 2 release preparation (2026-10-23)
+
+For v0.99-beta.2 (0.99/code 12), all 62 release JVM tests, release lint and optimized
+signed assembly passed. The earlier 62 debug JVM and 11 focused API 35 emulator
+tests plus debug lint/assembly passed. Full emulator instrumentation was not rerun.
+The candidate uses the established signing identity and immutable Beta 2 URLs;
+package/version, certificate, APK hash and public upload checksums are verified
+before publication and recorded with the clean source commit in build-info.json.
+
+PR #9 targets main and is updated for native fields and the Open POIs controller
+action. Stable 0.98 and distributed Beta 1 remain unchanged. Beta 2 device testing
+is pending, including actual one-cell sizing, controller dispatch, units and
+outdoor GPS/arrival behavior. No physical device install or legacy workflow is used.

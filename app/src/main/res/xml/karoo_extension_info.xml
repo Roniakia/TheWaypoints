@@ -4,10 +4,11 @@
     icon="@mipmap/ic_launcher"
     id="io.github.roniakia.waypoints"
     scansDevices="false">
-    <DataType typeId="nearest-poi" graphical="true"
+    <DataType typeId="nearest-poi" graphical="false"
         displayName="@string/poi_field_name" description="@string/poi_field_description"
         icon="@drawable/ic_poi_pin" />
-    <DataType typeId="selected-poi" graphical="true"
+    <DataType typeId="selected-poi" graphical="false"
         displayName="@string/poi_field_selected_name" description="@string/poi_field_selected_description"
         icon="@drawable/ic_poi_pin" />
+    <BonusAction actionId="open-pois" displayName="@string/poi_field_open" />
 </ExtensionInfo>

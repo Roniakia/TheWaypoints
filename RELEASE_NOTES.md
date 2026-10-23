@@ -1,5 +1,22 @@
 # Release notes
 
+### v0.99 — Beta 2, 2026-10-23
+
+Version 0.99/code 12; candidate `v0.99-beta.2`. Published Beta 1 remains unchanged.
+
+- Replace graphical POI tiles with native numeric distance fields so each can use
+  one normal cell. Karoo formats straight-line distances in the rider’s units;
+  the custom pin/category layout and field-tap action are removed.
+- Add Open POIs as a Karoo controller BonusAction. It opens the POI list without
+  requiring GPS; tapping a POI/Favorite still saves it before native-map launch.
+- Show No GPS, No POIs or Select POI explicitly, without blocking field setup
+  on GPS or a service connection. Invalid/stale fixes never become zero distance.
+- Selected-target arrival confirmation now follows the native stream lifecycle;
+  two distinct fresh fixes within 50m clear the target, preserving replacements.
+- After upgrading, remove/re-add the two fields if Karoo retains the old graphical
+  layout. Bind Open POIs in the Karoo controller configuration. Actual firmware
+  layout and controller dispatch still require a device retest.
+
 ### v0.99 — Beta 1, 2026-10-23
 
 Version 0.99 (code 11), candidate `v0.99-beta.1`; real Karoo acceptance pending.

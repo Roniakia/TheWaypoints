@@ -22,11 +22,12 @@
     <string name="distance_feet_formatted">%1s\nft</string>
     <string name="distance_meters_formatted">%1s\nm</string>
     <string name="poi_field_name">Nearest POI</string>
-    <string name="poi_field_description">Nearest downloaded POI distance. Tap to open POIs.</string>
+    <string name="poi_field_description">Nearest downloaded POI distance in one native cell.</string>
     <string name="poi_field_no_pois">No POIs</string>
     <string name="poi_field_no_gps">No GPS</string>
     <string name="poi_field_unavailable" translatable="false">—</string>
     <string name="poi_field_selected_name">Selected POI</string>
-    <string name="poi_field_selected_description">Distance to the POI selected in the app. Clears on arrival. Tap to open POIs.</string>
+    <string name="poi_field_selected_description">Distance to the POI selected in the app. Clears on arrival.</string>
     <string name="poi_field_select">Select POI</string>
+    <string name="poi_field_open">Open POIs</string>
 </resources>

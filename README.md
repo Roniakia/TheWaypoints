@@ -127,7 +127,7 @@ in the local testing guide.
 
 ## Release notes
 
-Development 0.99 (unreleased) adds compact Nearest POI and Selected POI Karoo ride fields. Tap a POI to select it; the selected field clears on confirmed arrival.
+Development 0.99 Beta 2 (unreleased, code 12) uses one-cell native Nearest POI and Selected POI distance fields plus an Open POIs controller action. Tap a POI in the app to select it; the selected field clears on confirmed arrival.
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md) for version history and changelogs.
 For manual beta publishing and stable promotion, see [the release guide](docs/RELEASING.md).

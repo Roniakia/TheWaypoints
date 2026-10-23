@@ -18,10 +18,11 @@
     <string name="distance_feet_formatted">%1s\npies</string>
     <string name="distance_meters_formatted">%1s\nm</string>
     <string name="poi_field_name">POI más cercano</string>
-    <string name="poi_field_description">Distancia al POI descargado más cercano. Toca para abrir los POIs.</string>
+    <string name="poi_field_description">Distancia al POI descargado más cercano.</string>
     <string name="poi_field_no_pois">Sin POIs</string>
     <string name="poi_field_no_gps">Sin GPS</string>
     <string name="poi_field_selected_name">POI seleccionado</string>
-    <string name="poi_field_selected_description">Distancia al POI seleccionado en la app. Se borra al llegar. Toca para abrir los POIs.</string>
+    <string name="poi_field_selected_description">Distancia al POI seleccionado en la app. Se borra al llegar.</string>
     <string name="poi_field_select">Elige POI</string>
+    <string name="poi_field_open">Abrir POIs</string>
 </resources>

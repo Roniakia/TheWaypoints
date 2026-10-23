@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.99 Beta 1: Add compact Nearest POI and Selected POI Karoo ride fields. Tap a POI or Favorite to select it for the field and open the native Karoo map. Selected destinations survive restarts and clear after two fresh GPS fixes within 50m while the field is active. Tap either field to open POIs. Metric straight-line distances; live ride binding and arrival behavior need Karoo testing. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.99 Beta 2: Replace graphical POI tiles with one-cell native distance fields and add an Open POIs controller action. Fields show No GPS, No POIs or Select POI explicitly. Karoo formats distances in the rider\u2019s units. POI/Favorite selection remains available without GPS and clears on confirmed arrival while its native stream is active. Remove/re-add fields if Karoo retains the old graphical layout; bind Open POIs in controller settings. Live Karoo layout and controller dispatch require retesting. Existing Favorites, packs, application identity and signing key are preserved. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

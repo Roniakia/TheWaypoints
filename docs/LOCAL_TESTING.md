@@ -607,3 +607,52 @@ and recorded with the exact source commit in the beta build-info.json.
 Source/version preparation goes through a PR to main. The beta is published from
 its exact feature commit; stable 0.98 remains unchanged. Real Karoo acceptance is
 pending. No physical device installation or legacy release workflow is used.
+
+## Native single-cell field correction (0.99 / 12, Beta 2 unreleased)
+
+The user reports Beta 1 live-field taps failed and graphical fields occupied two
+cells on a Karoo 3 with their latest OS (exact build unknown). They chose native
+numeric distance fields and an Open POIs controller action. Beta 1 is not accepted
+for stable promotion. Its public APK/tag have not been modified.
+
+All 62 normal-ID debug JVM tests passed. New native-stream tests verify an
+immediate unavailable state, no nearest search without GPS, raw metre distances
+for Karoo unit formatting, collector cancellation, distinct fresh-fix arrival
+confirmation, stale-GPS safety and recovery after a failed snapshot search.
+Persistent destination and atomic replacement tests remain passing.
+
+All 11 focused API 35 local-ID emulator tests passed: four PoiFieldTest cases and
+seven OfflineHomeTest cases. Checks cover both graphical=false registrations,
+Open POIs BonusAction metadata, native DISTANCE configuration, No GPS and Select
+POI state messages without RemoteViews/GPS/packs, cancellation, and opening the
+POIs intent. This does not execute actual Karoo controller dispatch or prove
+firmware cell allocation. The old direct preview-PendingIntent test was removed;
+it did not reproduce Beta 1's failing live-host interaction.
+
+Final normal-ID debug lint and assembly passed. No full emulator
+suite, release build, physical installation, commit, push or new publication was
+performed for this correction. Beta 2 reserves version 0.99/code 12 and tag
+v0.99-beta.2, retaining the name for the cohesive feature batch while increasing
+the distributed candidate code. Published Beta 1 remains 0.99/code 11.
+
+Karoo retest: upgrade Beta 2, remove/re-add existing POI fields if their old layout
+persists, verify each native field can use one cell, bind Open POIs to a controller,
+open the app without GPS, select a POI/Favorite, then test distance and arrival
+outdoors. Numeric fields do not provide custom category graphics or field taps.
+The default profile-editor sample is controlled by Karoo. Arrival runs while the
+native stream is subscribed. No location fix is fabricated or assumed from a
+window test; this change handles missing fixes rather than changing GNSS reception.
+
+## 0.99 Beta 2 release preparation (2026-10-23)
+
+For v0.99-beta.2 (0.99/code 12), all 62 release JVM tests, release lint and optimized
+signed assembly passed. The earlier 62 debug JVM and 11 focused API 35 emulator
+tests plus debug lint/assembly passed. Full emulator instrumentation was not rerun.
+The candidate uses the established signing identity and immutable Beta 2 URLs;
+package/version, certificate, APK hash and public upload checksums are verified
+before publication and recorded with the clean source commit in build-info.json.
+
+PR #9 targets main and is updated for native fields and the Open POIs controller
+action. Stable 0.98 and distributed Beta 1 remain unchanged. Beta 2 device testing
+is pending, including actual one-cell sizing, controller dispatch, units and
+outdoor GPS/arrival behavior. No physical device install or legacy workflow is used.
