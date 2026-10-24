@@ -17,6 +17,78 @@ import javax.inject.Provider
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class PoiFieldTest {
+    @Test fun extensionServiceCanBeConstructedWithRegisteredId() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val service = PoiFieldExtension()
+        context.resources.getXml(R.xml.karoo_extension_info).use { xml ->
+            while (xml.eventType != org.xmlpull.v1.XmlPullParser.START_TAG) xml.next()
+            assertEquals(xml.getAttributeValue(null, "id"), service.extension)
+        }
+        assertFalse(service.extension.contains('.'))
+    }
+
+    @Test fun manifestServiceBindsAndDispatchesEveryRegisteredView() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val connected = java.util.concurrent.CountDownLatch(1)
+        var binder: android.os.IBinder? = null
+        val connection = object : android.content.ServiceConnection {
+            override fun onServiceConnected(name: android.content.ComponentName, service: android.os.IBinder) {
+                binder = service; connected.countDown()
+            }
+            override fun onServiceDisconnected(name: android.content.ComponentName) = Unit
+        }
+        val bound = context.bindService(Intent(context, PoiFieldExtension::class.java), connection,
+            android.content.Context.BIND_AUTO_CREATE)
+        assertTrue(bound)
+        try {
+            assertTrue("Extension service never connected", connected.await(10, java.util.concurrent.TimeUnit.SECONDS))
+            val extension = io.hammerhead.karooext.aidl.IKarooExtension.Stub.asInterface(binder)
+            assertFalse(extension.libVersion().isNullOrEmpty())
+            val ids = mutableListOf<String>()
+            context.resources.getXml(R.xml.karoo_extension_info).use { xml ->
+                while (xml.eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                    if (xml.eventType == org.xmlpull.v1.XmlPullParser.START_TAG && xml.name == "DataType")
+                        ids += xml.getAttributeValue(null, "typeId")
+                    xml.next()
+                }
+            }
+            for (id in ids) {
+                val event = java.util.concurrent.CountDownLatch(1)
+                val views = java.util.concurrent.CopyOnWriteArrayList<android.widget.RemoteViews>()
+                val errors = java.util.concurrent.CopyOnWriteArrayList<String>()
+                val handler = object : io.hammerhead.karooext.aidl.IHandler.Stub() {
+                    override fun onNext(bundle: android.os.Bundle) {
+                        @Suppress("DEPRECATION")
+                        val view = bundle.getParcelable<android.widget.RemoteViews>("view")
+                        if (view != null) views += view
+                        if (!id.endsWith("-tappable") || view != null) event.countDown()
+                    }
+                    override fun onError(error: String) { errors += error; event.countDown() }
+                    override fun onComplete() = Unit
+                }
+                val request = "binding-test-$id"
+                try {
+                    extension.startView(request, id,
+                        ViewConfig(1 to 1, 120 to 80, 22, preview = true).bundleWithSerializable(context.packageName), handler)
+                    assertTrue("No view callback for $id", event.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                    assertTrue("$id errors: $errors", errors.isEmpty())
+                    if (id.endsWith("-tappable")) {
+                        assertEquals(1, views.size)
+                        val tile = views.single().apply(context, null)
+                        assertEquals(context.getString(R.string.poi_field_no_gps),
+                            tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
+                    }
+                    val streamed = java.util.concurrent.CountDownLatch(1)
+                    extension.startStream(request + "-stream", id, createConsumer<StreamState>(
+                        onNextCallback = { streamed.countDown() },
+                        onErrorCallback = { errors += it; streamed.countDown() }, onCompleteCallback = {}))
+                    assertTrue("No stream callback for $id", streamed.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                    assertTrue("$id stream errors: $errors", errors.isEmpty())
+                } finally { extension.stopView(request); extension.stopStream(request + "-stream") }
+            }
+        } finally { context.unbindService(connection) }
+    }
+
     @Test fun nativeAndTappableVariantsAreRegisteredAndOpenPoisActionExists() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val services = context.packageManager.queryIntentServices(
@@ -97,6 +169,7 @@ class PoiFieldTest {
             every { view.updateView(capture(rendered)) } just Runs
             field.startView(context, ViewConfig(1 to 1, 120 to 80, 22), view)
             runCurrent()
+            advanceTimeBy(1_001); runCurrent()
             val tile = rendered.last().apply(context, null)
             assertEquals(context.getString(R.string.poi_field_select),
                 tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
@@ -106,6 +179,32 @@ class PoiFieldTest {
             advanceTimeBy(30_000); runCurrent()
             assertEquals(updates, rendered.size)
         }
+    }
+
+    @Test fun fastInitialSelectionStatusSurvivesRealSdkThrottle() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val selected = java.util.concurrent.CountDownLatch(1)
+        val repo = mockk<SelectedPoiRepository>()
+        every { repo.selected } returns flowOf(null)
+        val handler = object : io.hammerhead.karooext.aidl.IHandler.Stub() {
+            override fun onNext(bundle: android.os.Bundle) {
+                @Suppress("DEPRECATION")
+                val view = bundle.getParcelable<android.widget.RemoteViews>("view") ?: return
+                val tile = view.apply(context, null)
+                if (tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString() ==
+                    context.getString(R.string.poi_field_select)) selected.countDown()
+            }
+            override fun onError(error: String) = Unit
+            override fun onComplete() = Unit
+        }
+        val emitter = ViewEmitter(context.packageName, handler)
+        val field = PoiFieldType(Provider { error("Selected view must not read packs") },
+            kotlinx.coroutines.Dispatchers.IO, { flowOf(null) }, repo, presentation = PoiFieldPresentation.GRAPHICAL)
+        try {
+            field.startView(context, ViewConfig(1 to 1, 120 to 80, 22), emitter)
+            assertTrue("Real ViewEmitter dropped the initial Select POI status",
+                selected.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        } finally { emitter.cancel() }
     }
 
     @Test fun renderedTileLaunchesPoiListWithoutGpsButPreviewDoesNot() {

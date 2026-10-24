@@ -143,3 +143,19 @@ Version 0.99/code 14; candidate `v0.99-beta.4`; device acceptance pending.
 - Graphical/compact tiles display metres/kilometres; native fields retain Karoo unit formatting.
   Nearest searches downloaded POIs; selected uses the saved target and existing arrival clearing.
 - No data migration or dependency change. Actual ride tapping and host sizing need Karoo testing.
+
+## 0.99 Beta 5 candidate
+
+Version 0.99/code 15; candidate `v0.99-beta.5`; device acceptance pending.
+
+- Fix extension service startup: use a dot-free Karoo extension ID instead of the
+  Android package ID, which the SDK rejects before any field can run. This caused
+  the live No Sensor state and prevented custom field taps from being installed.
+- Remove and re-add existing POI ride fields after upgrading; their Karoo extension
+  identity changes. Rebind the Open POIs controller action too. Favorites, downloaded
+  packs and selected destination remain in the same app storage.
+- Pace custom tile updates to preserve initial No POIs/Select POI states instead of
+  having the SDK discard updates sent immediately after the initial No GPS tile.
+- Retain nearest-downloaded and last-selected modes across all six field choices.
+  Compact one-cell taps remain experimental; actual ride-host behavior needs retest.
+- No dependency change, new permission or database migration.

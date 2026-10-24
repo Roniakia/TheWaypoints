@@ -753,3 +753,52 @@ changes stay on the PR branch targeting main. Publication uses the exact committ
 source and established signing identity with candidate-specific metadata and
 checksums. No physical installation or full emulator suite was performed. Device
 acceptance is pending; stable/latest and all earlier candidate assets are retained.
+
+## Extension startup failure — 2026-10-24, unreleased Beta 5
+
+Device feedback on Beta 4: all tested variants showed No Sensor and did not open
+the app. A new emulator constructor regression reproduced the exact exception
+`IllegalStateException: extension ID cannot contain '.'` before the fix. Previous
+field tests bypassed KarooExtension construction and could not catch this.
+
+Replace the package-shaped extension ID with `waypoints` in the service, data-type
+identity and XML, keeping application ID/storage unchanged. Device upgrade steps
+must explicitly remove/re-add the POI fields and rebind Open POIs because Karoo
+stores the extension identity in those bindings. Keep all six nearest/selected
+presentations; do not claim compact rendering/taps are established by this fix.
+
+The expanded integration test binds the actual manifest service, checks its SDK
+version and dispatches all registered streams/views through IKarooExtension. A
+real ViewEmitter regression checks that the initial Select POI update survives
+SDK throttling. Custom updates now wait 1000ms and send the latest reading.
+The first eight-case focused suite passed; additional real-emitter/stream test
+coverage required correcting callback names to match the pinned SDK. Final test
+results are recorded below. No physical Karoo installation or beta publication
+has occurred for this fix.
+
+Final Beta 5 local checks: 63 debug JVM tests and all nine focused API 35 emulator
+cases passed, zero failures/skips; debug lint and debug assembly passed. Service
+construction, actual manifest service binding and all six stream/view dispatches
+now pass. The real SDK emitter delivers the delayed Select POI tile. An intermediate
+integration-test assertion raced the stream's valid No POIs result against its
+initial No GPS preview; the test now verifies the preview before starting the
+stream. No release build, commit, push, tag, publication, full emulator suite or
+physical Karoo test was performed for this fix. Actual Karoo taps and compact
+allocation remain pending; a corrected Beta 5 is proposed for device retesting.
+
+## 0.99 Beta 5 release preparation (2026-10-24)
+
+Candidate v0.99-beta.5 uses version 0.99/code 15 and the established signing key.
+Passed 63 debug and 63 release JVM tests, nine focused API 35 emulator tests,
+debug/release lint, debug assembly and optimized signed release assembly. The
+previous constructor failure was reproduced before the fix; actual manifest
+service binding, all six stream/view dispatches and the real SDK emitter status
+transition now pass. Karoo ride-host taps/sizing and GPS/arrival retesting remain
+pending. No physical installation or full emulator suite was performed.
+
+The user authorized updating PR #9 and publishing this candidate. Source/version
+changes stay on the PR to main. Candidate artifacts record the exact committed
+source, certificate, immutable URLs and APK checksum. Remove/re-add all POI fields
+and rebind Open POIs after upgrading because the extension ID changed; keep app
+storage by upgrading without uninstalling. Stable/latest and earlier assets are
+preserved. Device acceptance is pending; no stable promotion is authorized.

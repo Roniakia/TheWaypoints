@@ -29,7 +29,8 @@ import javax.inject.Provider
 internal const val POI_FIELD_ID = "nearest-poi"
 internal const val OPEN_POIS = "de.dimskiy.waypoints.OPEN_POIS"
 internal const val OPEN_POIS_ACTION_ID = "open-pois"
-private const val EXTENSION_ID = "io.github.roniakia.waypoints"
+// KarooExtension rejects dotted IDs; this is deliberately distinct from the app ID.
+internal const val EXTENSION_ID = "waypoints"
 
 internal fun poiListIntent(context: Context) = Intent(context, MainActivity::class.java)
     .setAction(OPEN_POIS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -185,7 +186,12 @@ internal class PoiFieldType(
             // Own the reading job here so GPS/search and arrival work without a native field.
             val streamJob = if (config.preview) null else observeReadings { }
             val job = CoroutineScope(io).launch {
-                reading.collect { emitter.updateView(tappablePoiView(context, it, config.preview)) }
+                reading.collect {
+                    // The real SDK drops RemoteViews updates less than 900ms apart.
+                    // Keep the newest state, including a fast initial Select POI/No POIs.
+                    delay(1_000)
+                    emitter.updateView(tappablePoiView(context, reading.value, config.preview))
+                }
             }
             emitter.setCancellable { job.cancel(); streamJob?.cancel() }
             return

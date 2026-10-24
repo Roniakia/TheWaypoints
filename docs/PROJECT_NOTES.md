@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.99`, code `14` in `gradle.properties`; stable is 0.98 (10) |
+| Development version | `0.99`, code `15` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -709,3 +709,43 @@ changes stay on the PR branch targeting main. Publication uses the exact committ
 source and established signing identity with candidate-specific metadata and
 checksums. No physical installation or full emulator suite was performed. Device
 acceptance is pending; stable/latest and all earlier candidate assets are retained.
+
+## Extension startup correction (unreleased Beta 5)
+
+KarooExtension validates its ID in the constructor and rejects periods. The
+previous package-shaped ID prevented the service from being instantiated,
+although field metadata was still discoverable. Use `waypoints` consistently in
+the service, field data-type IDs and extension XML; keep the Android package
+identity unchanged. Existing Karoo field/controller bindings need re-adding.
+Tests now construct the service and bind the actual manifest service through
+IKarooExtension to dispatch every registered view, rather than only directly
+calling field implementations. Real ViewEmitter also throttles updates at 900ms;
+custom rendering now waits 1000ms and uses the latest reading to avoid dropping
+an immediate state transition. These fixes do not establish host sizing/taps.
+
+Final Beta 5 local checks: 63 debug JVM tests and all nine focused API 35 emulator
+cases passed, zero failures/skips; debug lint and debug assembly passed. Service
+construction, actual manifest service binding and all six stream/view dispatches
+now pass. The real SDK emitter delivers the delayed Select POI tile. An intermediate
+integration-test assertion raced the stream's valid No POIs result against its
+initial No GPS preview; the test now verifies the preview before starting the
+stream. No release build, commit, push, tag, publication, full emulator suite or
+physical Karoo test was performed for this fix. Actual Karoo taps and compact
+allocation remain pending; a corrected Beta 5 is proposed for device retesting.
+
+## 0.99 Beta 5 release preparation (2026-10-24)
+
+Candidate v0.99-beta.5 uses version 0.99/code 15 and the established signing key.
+Passed 63 debug and 63 release JVM tests, nine focused API 35 emulator tests,
+debug/release lint, debug assembly and optimized signed release assembly. The
+previous constructor failure was reproduced before the fix; actual manifest
+service binding, all six stream/view dispatches and the real SDK emitter status
+transition now pass. Karoo ride-host taps/sizing and GPS/arrival retesting remain
+pending. No physical installation or full emulator suite was performed.
+
+The user authorized updating PR #9 and publishing this candidate. Source/version
+changes stay on the PR to main. Candidate artifacts record the exact committed
+source, certificate, immutable URLs and APK checksum. Remove/re-add all POI fields
+and rebind Open POIs after upgrading because the extension ID changed; keep app
+storage by upgrading without uninstalling. Stable/latest and earlier assets are
+preserved. Device acceptance is pending; no stable promotion is authorized.
