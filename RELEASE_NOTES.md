@@ -1,5 +1,20 @@
 # Release notes
 
+### v0.99 — Beta 6, 2026-10-24
+
+Version 0.99/code 16; candidate `v0.99-beta.6`; device acceptance pending.
+
+- Show the POI name and category icon in graphical and experimental compact
+  tappable fields. A small outline pin and Nearest POI/Selected POI label form
+  the header; below, the category icon and full wrapping name stay left with the
+  distance at the right edge. Selected details remain visible without GPS.
+- Nearest fields update details from the nearest downloaded POI; selected fields
+  show the last selected destination and clear its details with confirmed arrival.
+- Tappable field descriptions explain that changing/replacing the field requires
+  the profile editor; long-press editing is unavailable. All supported locales updated.
+- Retain native numeric fields, existing tap actions and the valid extension ID.
+  No dependency change or data migration. Compact allocation remains experimental.
+
 ### v0.99 — Beta 5, 2026-10-24
 
 Version 0.99/code 15; candidate `v0.99-beta.5`; device acceptance pending.

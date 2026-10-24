@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.99`, code `15` in `gradle.properties`; stable is 0.98 (10) |
+| Development version | `0.99`, code `16` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -749,3 +749,56 @@ source, certificate, immutable URLs and APK checksum. Remove/re-add all POI fiel
 and rebind Open POIs after upgrading because the extension ID changed; keep app
 storage by upgrading without uninstalling. Stable/latest and earlier assets are
 preserved. Device acceptance is pending; no stable promotion is authorized.
+
+## POI tile details (unreleased Beta 6)
+
+Field readings now carry POI names/categories as well as distance/status. Nearest
+queries retain metadata from the winning downloaded POI; selected readings retain
+saved metadata without GPS and discard it when selection clears. Custom RemoteViews
+reuse the POI list category icon mapping and display pin, name and category/distance.
+Names use one ellipsized line to fit compact fields. Native numeric streams still
+emit raw metres. Tappable descriptions document profile-editor-only replacement.
+The user reports Beta 5 working and requests this UI refinement; no stable promotion
+or explicit acceptance of all device test cases is inferred from that feedback.
+
+Beta 6 local verification passed: 63 debug JVM tests, 11 focused API 35 emulator
+cases, debug lint and debug assembly. RemoteViews previews at 240x100dp and
+120x80dp were visually inspected for long-name truncation and icon/distance layout.
+Names/categories update even at unchanged distance; selected details survive
+missing GPS and disappear with selection. Actual Karoo layout/taps remain pending.
+
+Beta 6 visual follow-up uses the supplied native Karoo distance-field screenshot:
+a 12dp outline pin sits at the top-left beside the one-line POI name, and the
+category/distance row is left-aligned below it. Distance type increases to 28sp.
+The tile does not draw a border/pill because Karoo owns the field container. This
+reuses the pending Beta 6/code 16 bump; no additional version increment is needed.
+
+The latest Beta 6 layout revision keeps the outline pin/name on the left and
+right-aligns distance in the bottom row, with the category icon at the left edge.
+The name uses the remaining vertical area, wraps without ellipsis, and auto-sizes
+between 10sp and 14sp on supported Android versions. This supersedes the earlier
+one-line name and left-aligned distance mockups. Both preview sizes are checked
+for complete long-name layout, no ellipsis and distance alignment.
+
+The latest Beta 6 refinement separates the field label from POI content: the
+outline pin and localized Nearest POI/Selected POI form a persistent header.
+The body row contains category icon, full wrapping POI name, and right-aligned
+distance. Body names auto-size 8–14sp; compact distance uses 16sp to preserve room,
+graphical distance 24sp (status 20sp). This replaces the prior header-name mockup.
+
+## 0.99 Beta 6 release preparation (2026-10-24)
+
+Candidate v0.99-beta.6 uses 0.99/code 16. Passed 63 debug and 63 release JVM tests,
+11 focused API 35 emulator cases, debug/release lint, debug assembly and optimized
+signed release assembly. Final previews at 240x100dp and 120x80dp were visually
+inspected: a fixed field label sits above category/name/distance; the full long-name
+sample fits without ellipsis and distance aligns right. Compact uses smaller text.
+Actual Karoo layout/readability/tap retesting and the full emulator suite remain
+pending; no physical installation occurred.
+
+The user approved the final layout and authorized updating PR #9 and publishing
+this beta. That is not stable-promotion acceptance. Source/version changes remain
+on the PR to main. Candidate records include the exact committed source, signing
+certificate, immutable URLs and APK SHA-256. Extension/type IDs remain unchanged
+from Beta 5; upgrades from Beta 4 or older require field/controller rebinding.
+Stable/latest and all earlier candidate assets are retained.

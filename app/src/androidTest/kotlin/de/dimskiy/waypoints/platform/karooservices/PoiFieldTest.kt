@@ -181,6 +181,94 @@ class PoiFieldTest {
         }
     }
 
+    @Test fun nearestTileUpdatesNameAndCategoryEvenWhenDistanceIsUnchanged() = runTest {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val point = PoiPosition(55.6, 13.0)
+        for (presentation in listOf(PoiFieldPresentation.GRAPHICAL, PoiFieldPresentation.EXPERIMENTAL_COMPACT)) {
+            val store = mockk<RegionPackStore>()
+            every { store.installed() } returns listOf(InstalledRegion("test", "Test", "1", 1))
+            val water = OfflinePoi("node/1", "Riverside fountain", point, setOf("water.drinking_water"), "{}", 1234.5)
+            val cafe = water.copy(osmId = "node/2", name = "Riverside coffee station with a very long name", categories = setOf("food.cafe"))
+            every { store.search(any(), any()) } returns PoiPage(listOf(water), 1, false) andThen PoiPage(listOf(cafe), 1, false)
+            val view = mockk<ViewEmitter>(relaxed = true)
+            val rendered = mutableListOf<android.widget.RemoteViews>()
+            val cancel = slot<() -> Unit>()
+            every { view.updateView(capture(rendered)) } just Runs
+            every { view.setCancellable(capture(cancel)) } just Runs
+            val field = PoiFieldType(Provider { store }, StandardTestDispatcher(testScheduler),
+                { flowOf(PoiFieldFix(point, 1000)) }, elapsedTime = { 1000 }, presentation = presentation)
+            field.startView(context, ViewConfig(1 to 1, 120 to 80, 22), view)
+            runCurrent(); advanceTimeBy(1_001); runCurrent()
+            var tile = rendered.last().apply(context, null)
+            assertEquals(context.getString(R.string.poi_field_name),
+                tile.findViewById<android.widget.TextView>(R.id.poi_field_title).text.toString())
+            assertEquals(water.name, tile.findViewById<android.widget.TextView>(R.id.poi_field_name).text.toString())
+            assertEquals("1.2 km", tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
+            assertTrue(tile.contentDescription.toString().contains(PoiTypes.label("water.drinking_water")))
+            advanceTimeBy(5_000); runCurrent(); advanceTimeBy(1_001); runCurrent()
+            tile = rendered.last().apply(context, null)
+            assertEquals(cafe.name, tile.findViewById<android.widget.TextView>(R.id.poi_field_name).text.toString())
+            assertEquals("1.2 km", tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
+            assertTrue(tile.contentDescription.toString().contains(PoiTypes.label("food.cafe")))
+            assertEquals(android.view.View.VISIBLE, tile.findViewById<android.view.View>(R.id.poi_field_category).visibility)
+            saveTilePreview(context, tile, if (presentation == PoiFieldPresentation.GRAPHICAL) 240 else 120,
+                if (presentation == PoiFieldPresentation.GRAPHICAL) 100 else 80, "poi-field-${presentation.name.lowercase()}.png")
+            cancel.captured(); advanceUntilIdle()
+        }
+    }
+
+    @Test fun selectedTileKeepsIdentityWithoutGpsAndClearsItWithSelection() = runTest {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val target = MutableStateFlow<SelectedPoi?>(SelectedPoi("target", "Hilltop lookout", PoiPosition(55.6, 13.0), setOf("sights.viewpoint")))
+        val repo = mockk<SelectedPoiRepository>()
+        every { repo.selected } returns target
+        val rendered = mutableListOf<android.widget.RemoteViews>()
+        val view = mockk<ViewEmitter>(relaxed = true)
+        val cancel = slot<() -> Unit>()
+        every { view.updateView(capture(rendered)) } just Runs
+        every { view.setCancellable(capture(cancel)) } just Runs
+        val field = PoiFieldType(Provider { error("Selected tile must not read packs") },
+            StandardTestDispatcher(testScheduler), { flowOf(null) }, repo, presentation = PoiFieldPresentation.GRAPHICAL)
+        field.startView(context, ViewConfig(1 to 1, 120 to 80, 22), view)
+        runCurrent(); advanceTimeBy(1_001); runCurrent()
+        var tile = rendered.last().apply(context, null)
+        assertEquals(context.getString(R.string.poi_field_selected_name),
+            tile.findViewById<android.widget.TextView>(R.id.poi_field_title).text.toString())
+        assertEquals("Hilltop lookout", tile.findViewById<android.widget.TextView>(R.id.poi_field_name).text.toString())
+        assertEquals(context.getString(R.string.poi_field_no_gps), tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
+        coVerify(exactly = 0) { repo.clearIfSelected(any()) }
+        target.value = null
+        advanceTimeBy(5_000); runCurrent(); advanceTimeBy(1_001); runCurrent()
+        tile = rendered.last().apply(context, null)
+        assertEquals(context.getString(R.string.poi_field_selected_name),
+            tile.findViewById<android.widget.TextView>(R.id.poi_field_title).text.toString())
+        assertEquals(android.view.View.GONE, tile.findViewById<android.view.View>(R.id.poi_field_name).visibility)
+        assertEquals(android.view.View.GONE, tile.findViewById<android.view.View>(R.id.poi_field_category).visibility)
+        assertEquals(context.getString(R.string.poi_field_select), tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).text.toString())
+        cancel.captured(); advanceUntilIdle()
+    }
+
+    private fun saveTilePreview(context: android.content.Context, tile: android.view.View, widthDp: Int, heightDp: Int, name: String) {
+        val density = context.resources.displayMetrics.density
+        val width = (widthDp * density).toInt(); val height = (heightDp * density).toInt()
+        tile.measure(android.view.View.MeasureSpec.makeMeasureSpec(width, android.view.View.MeasureSpec.EXACTLY),
+            android.view.View.MeasureSpec.makeMeasureSpec(height, android.view.View.MeasureSpec.EXACTLY))
+        tile.layout(0, 0, width, height)
+        val title = tile.findViewById<android.widget.TextView>(R.id.poi_field_name)
+        val lines = title.layout
+        assertTrue("Long POI name should wrap", lines.lineCount > 1)
+        assertEquals("Full POI name must remain visible", title.text.length, lines.getLineEnd(lines.lineCount - 1))
+        assertTrue("Name must fit vertically", lines.getLineBottom(lines.lineCount - 1) <= title.height)
+        for (line in 0 until lines.lineCount) assertEquals(0, lines.getEllipsisCount(line))
+        assertEquals(android.view.Gravity.RIGHT,
+            android.view.Gravity.getAbsoluteGravity(tile.findViewById<android.widget.TextView>(R.id.poi_field_distance).gravity,
+                android.view.View.LAYOUT_DIRECTION_LTR) and android.view.Gravity.HORIZONTAL_GRAVITY_MASK)
+        val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+        tile.draw(android.graphics.Canvas(bitmap))
+        java.io.File(context.cacheDir, name).outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+        bitmap.recycle()
+    }
+
     @Test fun fastInitialSelectionStatusSurvivesRealSdkThrottle() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val selected = java.util.concurrent.CountDownLatch(1)

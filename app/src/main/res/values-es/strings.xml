@@ -29,6 +29,6 @@
     <string name="poi_field_selected_tappable">POI seleccionado · táctil</string>
     <string name="poi_field_nearest_compact">POI más cercano · compacto experimental</string>
     <string name="poi_field_selected_compact">POI seleccionado · compacto experimental</string>
-    <string name="poi_field_tappable_description">Toca para abrir los POI. Campo gráfico; Karoo controla el tamaño. Distancia en metros/kilómetros.</string>
-    <string name="poi_field_compact_description">Campo táctil experimental de una celda. Karoo podría no admitir su visualización o los toques. Distancia en metros/kilómetros.</string>
+    <string name="poi_field_tappable_description">Toca para abrir los POI. Campo gráfico; Karoo controla el tamaño. Distancia en metros/kilómetros. Cambia o sustituye este campo en el editor de perfiles; no se puede editar con una pulsación larga.</string>
+    <string name="poi_field_compact_description">Campo táctil experimental de una celda. Karoo podría no admitir su visualización o los toques. Distancia en metros/kilómetros. Cambia o sustituye este campo en el editor de perfiles; no se puede editar con una pulsación larga.</string>
 </resources>

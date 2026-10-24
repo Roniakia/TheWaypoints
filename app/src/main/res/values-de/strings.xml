@@ -29,6 +29,6 @@
     <string name="poi_field_selected_tappable">Ausgewählter POI · antippbar</string>
     <string name="poi_field_nearest_compact">Nächster POI · kompakt experimentell</string>
     <string name="poi_field_selected_compact">Ausgewählter POI · kompakt experimentell</string>
-    <string name="poi_field_tappable_description">Antippen öffnet POIs. Grafisches Feld; Karoo bestimmt die Größe. Entfernung in Metern/Kilometern.</string>
-    <string name="poi_field_compact_description">Experimentelles antippbares Einzelfeld. Darstellung und Tippen werden möglicherweise nicht von Karoo unterstützt. Entfernung in Metern/Kilometern.</string>
+    <string name="poi_field_tappable_description">Antippen öffnet POIs. Grafisches Feld; Karoo bestimmt die Größe. Entfernung in Metern/Kilometern. Dieses Feld im Profileditor ändern oder ersetzen; Bearbeiten durch langes Drücken ist nicht verfügbar.</string>
+    <string name="poi_field_compact_description">Experimentelles antippbares Einzelfeld. Darstellung und Tippen werden möglicherweise nicht von Karoo unterstützt. Entfernung in Metern/Kilometern. Dieses Feld im Profileditor ändern oder ersetzen; Bearbeiten durch langes Drücken ist nicht verfügbar.</string>
 </resources>

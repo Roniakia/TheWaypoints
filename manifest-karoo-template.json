@@ -7,5 +7,5 @@
   "latestVersionCode": "BUMPED BY GRADLE",
   "developer": "Roniakia",
   "description": "BUMPED BY GRADLE",
-  "releaseNotes": "0.99 Beta 5: Fixes extension service startup by using a valid dot-free Karoo extension ID. Prior IDs could prevent all fields from starting and show No Sensor. Remove and re-add POI fields and rebind Open POIs after upgrading; app data is retained. Preserves initial custom tile status updates. Nearest downloaded and last-selected modes remain; compact taps are still experimental. No dependency change or data migration. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
+  "releaseNotes": "0.99 Beta 6: Tappable nearest/selected fields now show the POI name and category icon with a small outline pin and fixed Nearest POI/Selected POI header. Below it, the category icon and full wrapping POI name stay left and distance aligns right. Selected details remain visible without GPS. Descriptions explain that fields must be changed in the profile editor, with no long-press editing. Native numeric fields and valid extension startup remain. No migration or dependency change. Compact taps/sizing remain experimental. Based on the original Waypoints idea and codebase by Vadim Sinitskiy."
 }

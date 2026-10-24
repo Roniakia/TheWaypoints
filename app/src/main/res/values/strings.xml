@@ -34,6 +34,6 @@
     <string name="poi_field_selected_tappable">Selected POI · tappable</string>
     <string name="poi_field_nearest_compact">Nearest POI · compact experimental</string>
     <string name="poi_field_selected_compact">Selected POI · compact experimental</string>
-    <string name="poi_field_tappable_description">Tap to open POIs. Graphical field; Karoo controls size. Distance in metres/kilometres.</string>
-    <string name="poi_field_compact_description">Experimental one-cell tap to open POIs. Rendering and taps may be unsupported by Karoo. Distance in metres/kilometres.</string>
+    <string name="poi_field_tappable_description">Tap to open POIs. Graphical field; Karoo controls size. Distance in metres/kilometres. Change or replace this field in the profile editor; long-press editing is unavailable.</string>
+    <string name="poi_field_compact_description">Experimental one-cell tap to open POIs. Rendering and taps may be unsupported by Karoo. Distance in metres/kilometres. Change or replace this field in the profile editor; long-press editing is unavailable.</string>
 </resources>

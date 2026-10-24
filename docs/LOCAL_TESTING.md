@@ -802,3 +802,84 @@ source, certificate, immutable URLs and APK checksum. Remove/re-add all POI fiel
 and rebind Open POIs after upgrading because the extension ID changed; keep app
 storage by upgrading without uninstalling. Stable/latest and earlier assets are
 preserved. Device acceptance is pending; no stable promotion is authorized.
+
+## POI tile details — 2026-10-24, unreleased Beta 6
+
+Passed 63 debug JVM tests, all 11 focused PoiFieldTest cases on the local API 35
+emulator, debug lint and debug assembly. The new view cases verify nearest name/
+category refresh when distance is unchanged, selected identity without GPS, and
+clearing name/icon with selection. Existing real service construction/binding,
+all six stream/view dispatches, real emitter throttling and tap tests still pass.
+An initial test fixture used the wrong copy parameter name; it was corrected to
+OfflinePoi.osmId before the successful run.
+
+Emulator-rendered RemoteViews previews were visually inspected at 240x100dp and
+120x80dp (480x200px and 240x160px). The small map pin sits above an ellipsized name;
+the yellow category icon sits beside the distance below. Both sizes retain readable
+name/distance and the full category icon. The descriptions document profile-editor
+replacement and unavailable long-press editing in English, German, French, Spanish
+and Italian. Category icons reuse the existing list mapping.
+
+Beta 5 feedback says the fields seem to work; this does not imply stable-release
+acceptance or verification of every hardware scenario. Beta 6 still needs on-device
+layout/tap checking, particularly the compact experimental format. The valid
+extension ID and all six type IDs remain unchanged from Beta 5. No physical
+installation, full emulator suite, release build, commit, push or publication was
+performed for this batch. A Beta 6 candidate is proposed for device retesting.
+
+### Native-style tile alignment follow-up (same Beta 6 / code 16)
+
+The supplied Karoo distance-field reference prompted a top-left header: 12dp
+outline pin beside an ellipsized name, followed by a left-aligned category icon
+and 28sp distance. Missing-state text remains 20sp. Updated RemoteViews previews
+were visually inspected at 240x100dp and 120x80dp; the full outline pin and category
+icon are visible and the 1.2 km value remains readable in the compact example.
+
+All 11 focused API 35 emulator tests passed on the final layout; debug lint,
+debug assembly and the 63 debug JVM tests passed for this follow-up. The first
+instrumentation attempt exited before running any cases, and the retry hit
+emulator property-fetch timeouts. The stalled test client/emulator were stopped
+and the existing AVD restarted without wiping data; the final run completed with
+zero failures/skips. No physical installation, release build, commit or publication.
+
+### Full-name / right-distance revision (same Beta 6 / code 16)
+
+The latest requested layout supersedes the left-distance mockup: the outline pin
+and POI name stay at the left, the category icon stays at the lower left, and the
+distance aligns to the lower right. The name uses available height, wraps without
+ellipsis and auto-sizes from 14sp to 10sp. All 11 focused API 35 tests, debug lint
+and debug assembly passed. The preview test explicitly checks multiline layout,
+the last visible character, vertical fit, zero ellipsis and right distance gravity
+at 240x100dp and 120x80dp. The full long-name sample is visible in both rendered
+previews, which were inspected. No new version increment, commit or publication.
+
+### Separate field header and POI body (same Beta 6 / code 16)
+
+The final requested structure uses a small outline pin and fixed, localized
+Nearest POI/Selected POI header. The body row places category icon/full wrapping
+name at the left and distance at the right. Compact distance is 16sp to reserve
+name width; graphical distance is 24sp. Name auto-sizing ranges from 8–14sp.
+The label remains visible even when the selected destination clears.
+
+All 11 focused API 35 emulator cases, debug lint and debug assembly passed.
+Tests assert the nearest and selected header labels separately from POI names,
+and verify the full long-name sample fits without ellipsis in 240x100dp and
+120x80dp previews. Both final previews were visually inspected. The compact
+example uses smaller body text to fit its full name. No commit or publication.
+
+## 0.99 Beta 6 release preparation (2026-10-24)
+
+Candidate v0.99-beta.6 uses 0.99/code 16. Passed 63 debug and 63 release JVM tests,
+11 focused API 35 emulator cases, debug/release lint, debug assembly and optimized
+signed release assembly. Final previews at 240x100dp and 120x80dp were visually
+inspected: a fixed field label sits above category/name/distance; the full long-name
+sample fits without ellipsis and distance aligns right. Compact uses smaller text.
+Actual Karoo layout/readability/tap retesting and the full emulator suite remain
+pending; no physical installation occurred.
+
+The user approved the final layout and authorized updating PR #9 and publishing
+this beta. That is not stable-promotion acceptance. Source/version changes remain
+on the PR to main. Candidate records include the exact committed source, signing
+certificate, immutable URLs and APK SHA-256. Extension/type IDs remain unchanged
+from Beta 5; upgrades from Beta 4 or older require field/controller rebinding.
+Stable/latest and all earlier candidate assets are retained.
