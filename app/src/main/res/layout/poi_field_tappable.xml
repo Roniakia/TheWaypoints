@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/poi_field_root" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    android:gravity="center" android:padding="4dp" android:background="#FF000000"
+    android:contentDescription="@string/poi_field_open">
+    <!-- RemoteViews inflates platform widgets; app:tint is not applied by the host. -->
+    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+        tools:ignore="UseAppTint" android:src="@drawable/ic_poi_pin" android:tint="#FFF8D84A"
+        android:importantForAccessibility="no" />
+    <TextView android:id="@+id/poi_field_distance" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:gravity="center"
+        android:maxLines="1" android:ellipsize="end" android:textSize="20sp"
+        android:textColor="#FFFFFFFF" android:text="@string/poi_field_no_gps" />
+</LinearLayout>

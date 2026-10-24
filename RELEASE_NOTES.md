@@ -1,5 +1,17 @@
 # Release notes
 
+### v0.99 — Beta 4, 2026-10-24
+
+Version 0.99/code 14; candidate `v0.99-beta.4`; device acceptance pending.
+
+- Retain native one-cell Nearest POI and Selected POI fields and the Open POIs controller action.
+- Add tappable graphical variants for both modes, opening the POI list even without GPS.
+- Add separately named experimental compact tappable variants for both modes.
+  Karoo may ignore custom rendering/taps on these numeric registrations; one-cell operation is unverified.
+- Graphical/compact tiles display metres/kilometres; native fields retain Karoo unit formatting.
+  Nearest searches downloaded POIs; selected uses the saved target and existing arrival clearing.
+- No data migration or dependency change. Actual ride tapping and host sizing need Karoo testing.
+
 ### v0.99 — Beta 3, 2026-10-23
 
 Version 0.99/code 13; candidate `v0.99-beta.3`; device acceptance pending. Earlier beta assets remain unchanged.

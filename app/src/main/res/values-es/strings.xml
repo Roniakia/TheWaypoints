@@ -25,4 +25,10 @@
     <string name="poi_field_selected_description">Distancia al POI seleccionado en la app. Se borra al llegar.</string>
     <string name="poi_field_select">Elige POI</string>
     <string name="poi_field_open">Abrir POIs</string>
+    <string name="poi_field_nearest_tappable">POI más cercano · táctil</string>
+    <string name="poi_field_selected_tappable">POI seleccionado · táctil</string>
+    <string name="poi_field_nearest_compact">POI más cercano · compacto experimental</string>
+    <string name="poi_field_selected_compact">POI seleccionado · compacto experimental</string>
+    <string name="poi_field_tappable_description">Toca para abrir los POI. Campo gráfico; Karoo controla el tamaño. Distancia en metros/kilómetros.</string>
+    <string name="poi_field_compact_description">Campo táctil experimental de una celda. Karoo podría no admitir su visualización o los toques. Distancia en metros/kilómetros.</string>
 </resources>

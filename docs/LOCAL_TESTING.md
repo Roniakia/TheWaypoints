@@ -716,3 +716,40 @@ commit/build/publication and updating PR #9. Source is prepared on a new feature
 branch and fast-forwarded into the existing PR's head, preserving review to main.
 Stable 0.98 and Beta 1/Beta 2 assets remain unchanged. Beta 3 device acceptance is
 pending; no physical installation, full emulator suite or legacy workflow run.
+
+## Tappable field variants — 2026-10-24, unreleased Beta 4
+
+Passed 63 debug JVM tests and six focused PoiFieldTest cases on the local API 35
+emulator, with zero failures/skips. Debug lint and debug assembly passed. The
+focused cases cover all six registrations, native distance/status behavior,
+selected no-GPS state, direct activity PendingIntent launch from an applied tile,
+non-clickable previews, custom-view refresh without a numeric subscription, and
+cancellation of the custom view's location flow. Initial lint found missing new
+translations and appcompat's tint rule; translations were added and the tint
+rule is locally suppressed because RemoteViews requires platform widgets.
+
+These tests do not run inside Karoo's ride host. On Karoo 3, add nearest and
+selected graphical variants independently, then tap during an active ride with
+and without GPS. Confirm POI-list navigation and that choosing a POI updates the
+selected field while nearest continues searching downloaded packs. Confirm
+arrival clearing still works with only a graphical selected field present.
+Repeat for compact experimental registrations, recording actual grid size,
+whether custom rendering is accepted and whether the tap reaches the activity.
+If Karoo ignores those custom views, use the retained native fields plus Open
+POIs controller action. Preview taps must not open the app. No physical device
+installation, signed beta build, commit, push or publication was performed.
+
+## 0.99 Beta 4 release preparation (2026-10-24)
+
+Candidate v0.99-beta.4 uses 0.99/code 14. Passed 63 debug and 63 release JVM tests,
+six focused API 35 PoiFieldTest cases, debug/release lint, debug assembly and
+optimized signed release assembly. The applied RemoteViews click test verifies
+the app intent locally; actual Karoo ride host dispatch and graphical/compact
+allocation are still device checks. Custom-view lifecycle tests cover refresh
+without a native subscription and cancellation of location collection.
+
+The user authorized updating PR #9 and publishing this beta. Source and version
+changes stay on the PR branch targeting main. Publication uses the exact committed
+source and established signing identity with candidate-specific metadata and
+checksums. No physical installation or full emulator suite was performed. Device
+acceptance is pending; stable/latest and all earlier candidate assets are retained.

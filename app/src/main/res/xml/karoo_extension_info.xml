@@ -10,5 +10,17 @@
     <DataType typeId="selected-poi" graphical="false"
         displayName="@string/poi_field_selected_name" description="@string/poi_field_selected_description"
         icon="@drawable/ic_poi_pin" />
+    <DataType typeId="nearest-poi-tappable" graphical="true"
+        displayName="@string/poi_field_nearest_tappable" description="@string/poi_field_tappable_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="nearest-poi-compact-tappable" graphical="false"
+        displayName="@string/poi_field_nearest_compact" description="@string/poi_field_compact_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="selected-poi-tappable" graphical="true"
+        displayName="@string/poi_field_selected_tappable" description="@string/poi_field_tappable_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="selected-poi-compact-tappable" graphical="false"
+        displayName="@string/poi_field_selected_compact" description="@string/poi_field_compact_description"
+        icon="@drawable/ic_poi_pin" />
     <BonusAction actionId="open-pois" displayName="@string/poi_field_open" />
 </ExtensionInfo>

@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.99`, code `13` in `gradle.properties`; stable is 0.98 (10) |
+| Development version | `0.99`, code `14` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -683,3 +683,29 @@ commit/build/publication and updating PR #9. Source is prepared on a new feature
 branch and fast-forwarded into the existing PR's head, preserving review to main.
 Stable 0.98 and Beta 1/Beta 2 assets remain unchanged. Beta 3 device acceptance is
 pending; no physical installation, full emulator suite or legacy workflow run.
+
+## Tappable field variants (unreleased Beta 4)
+
+The six registered types share nearest/selected stream behavior. Existing native IDs
+remain numeric. New `-tappable` IDs use graphical RemoteViews, and experimental
+`-compact-tappable` IDs attempt RemoteViews on numeric registrations. The latter
+is outside documented SDK custom-view guidance and may be ignored by Karoo.
+Activity PendingIntents target MainActivity directly, skip profile previews, and
+remain attached for all missing-data states. Custom tiles currently use metric
+labels; native fields retain rider-unit formatting. Host sizing is controlled by
+Karoo and real ride dispatch is not established by applying RemoteViews locally.
+
+## 0.99 Beta 4 release preparation (2026-10-24)
+
+Candidate v0.99-beta.4 uses 0.99/code 14. Passed 63 debug and 63 release JVM tests,
+six focused API 35 PoiFieldTest cases, debug/release lint, debug assembly and
+optimized signed release assembly. The applied RemoteViews click test verifies
+the app intent locally; actual Karoo ride host dispatch and graphical/compact
+allocation are still device checks. Custom-view lifecycle tests cover refresh
+without a native subscription and cancellation of location collection.
+
+The user authorized updating PR #9 and publishing this beta. Source and version
+changes stay on the PR branch targeting main. Publication uses the exact committed
+source and established signing identity with candidate-specific metadata and
+checksums. No physical installation or full emulator suite was performed. Device
+acceptance is pending; stable/latest and all earlier candidate assets are retained.
