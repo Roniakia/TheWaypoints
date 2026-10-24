@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/poi_field_root" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    android:gravity="top|start" android:padding="4dp" android:background="#FF000000"
+    android:contentDescription="@string/poi_field_open">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical|start">
+        <!-- RemoteViews uses platform widgets; app:tint is not applied by the host. -->
+        <ImageView android:layout_width="12dp" android:layout_height="12dp"
+            android:layout_marginEnd="4dp" tools:ignore="UseAppTint"
+            android:src="@drawable/ic_poi_pin_outline" android:tint="#FFF8D84A"
+            android:importantForAccessibility="no" />
+        <TextView android:id="@+id/poi_field_title" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:gravity="start" android:textSize="14sp" android:maxLines="1"
+            android:includeFontPadding="false" android:textColor="#FFFFFFFF" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="2dp"
+        android:orientation="horizontal" android:gravity="center_vertical|start">
+        <ImageView android:id="@+id/poi_field_category" android:layout_width="18dp"
+            android:layout_height="18dp" android:layout_marginEnd="4dp"
+            tools:ignore="UseAppTint" android:src="@drawable/ic_poi_pin"
+            android:tint="#FFF8D84A" android:importantForAccessibility="no" />
+        <TextView android:id="@+id/poi_field_name" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="match_parent"
+            android:layout_marginEnd="4dp" android:gravity="center_vertical|start"
+            android:textSize="14sp" android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="8sp" android:autoSizeMaxTextSize="14sp"
+            android:autoSizeStepGranularity="1sp" tools:targetApi="26"
+            android:includeFontPadding="false" android:textColor="#FFFFFFFF" />
+        <TextView android:id="@+id/poi_field_distance" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:gravity="end"
+            android:maxLines="1" android:ellipsize="end" android:textSize="24sp"
+            android:includeFontPadding="false" android:textColor="#FFFFFFFF"
+            android:text="@string/poi_field_no_gps" />
+    </LinearLayout>
+</LinearLayout>

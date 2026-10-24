@@ -22,7 +22,7 @@ itself does not calculate routes or render a navigation map.
 | --- | --- |
 | Module / application ID | `app` / `io.github.roniakia.waypoints` |
 | Kotlin namespace | `de.dimskiy.waypoints` (internal source namespace retained) |
-| Development version | `0.98`, code `10` in `gradle.properties`; stable is 0.96 (8) |
+| Development version | `0.99`, code `16` in `gradle.properties`; stable is 0.98 (10) |
 | Gradle / Android plugin | `8.13` / `8.9.2` |
 | Kotlin / KSP | `2.1.10` / `2.1.10-1.0.31` |
 | Android SDK | min 23, compile/target 35 |
@@ -175,8 +175,8 @@ are under `app/schemas/`. Preferences file is `location_settings`.
 ## Integration and delivery
 
 Manifest declares a launcher activity, INTERNET permission, extension metadata,
-and this repository's release manifest URL; it does not declare a custom
-`KarooExtension` service for ride data fields. UI resources include English,
+and this repository's release manifest URL; it declares `PoiFieldExtension`, a custom
+`KarooExtension` service for the graphical Nearest POI and Selected POI ride data fields. UI resources include English,
 German, Spanish, French, and Italian strings. Preview configuration targets
 Karoo 2 at 480×800 pixels / 295 dpi.
 
@@ -513,3 +513,292 @@ Prepare beta means local packaging under app/build/beta/<tag>/ with upload/
 artifacts, copyable GITHUB_RELEASE.md, and publication/promotion instructions.
 No automatic GitHub tagging/upload/publication. Record uncommitted source honestly
 and finalize provenance after commit. See RELEASING.md.
+
+## Nearest POI ride field (unreleased 0.99 / 11)
+
+Feature branch: codex/karoo-poi-field in an isolated managed worktree. Existing
+uncommitted stable-release documentation in the original checkout is preserved.
+The exported KarooExtension service registers two graphical DataTypes using the
+existing extension ID. RemoteViews hides the standard header and centers a small
+map pin above a category icon and distance, designed for one profile cell.
+Karoo profile layout controls the actual field allocation; larger cells also work.
+
+A field view owns a separate Karoo connection and location consumer, removed on
+emitter cancellation. Searches run on the injected IO dispatcher every five
+seconds and use the existing region-pack store with cancellation checks. All
+downloaded categories participate, independently of app filters; Favorites do not.
+Distance uses metric straight-line formatting, consistent with the offline list.
+No GPS fix within 30 seconds shows No GPS; missing/empty packs show No POIs.
+The editor preview does not connect to Karoo or open packs. Whole-cell PendingIntent
+uses CLEAR_TOP to recreate MainActivity and explicitly select POIs, including when
+the app was previously on Settings/Favorites/Regions. No Room/dependency changes.
+
+The current nearest search scans installed POIs; five-second polling should be
+benchmarked with large multi-region datasets on hardware. Stock Android cannot
+validate Karoo ride-cell sizing, service binding, live fixes or in-ride launching.
+
+### Selected POI follow-up (same 0.99 / 11 batch)
+
+SelectedPoiRepository stores a destination snapshot (name, coordinates, categories,
+unique selection token) in the existing DataStore. POI/Favorite taps persist this
+selection before launching the native map; a map-service timeout retains it.
+No Room schema changes. It remains independent of pack removal or unbookmarking.
+The selected field uses the same single-cell layout and POIs launch action, with
+Select POI for an empty target and its category icon plus No GPS without a fresh
+fix. The nearest field remains independent of the selected destination.
+
+Arrival confirmation requires two different location-event timestamps within
+50 metres, checked on the field's five-second refresh. Reusing a cached fix
+cannot confirm arrival. An outside/missing/stale fix resets confirmation. A new
+selection token resets confirmation even for the same coordinates. Clearing is
+an atomic DataStore comparison against that token, preserving a later selection.
+Monitoring runs while the selected field view is active; it does not add an
+always-on background location service. Passing the destination while the field
+is inactive is not recorded. Real-device GPS/arrival behavior remains unverified.
+
+Validation: all 58 debug JVM tests, 12 focused API 35 emulator tests, debug lint
+and debug assembly passed. The 160x100 RemoteViews preview was visually inspected.
+Details and real-device beta scenarios are recorded in LOCAL_TESTING.md. No
+commit, publication or physical device installation occurred.
+
+## 0.99 Beta 1 candidate preparation (2026-10-23)
+
+For v0.99-beta.1, all 58 release JVM tests passed, along with release lint and
+optimized signed assembly. The earlier 58 debug JVM and 12 focused local-ID
+API 35 emulator tests also passed. Full emulator instrumentation was not rerun;
+stock Android does not exercise live Karoo ride-screen binding or arrival fixes.
+Version 0.99/code 11 uses the established signing identity and immutable candidate
+URLs. Public package metadata, certificate and SHA-256 are verified before upload
+and recorded with the exact source commit in the beta build-info.json.
+
+Source/version preparation goes through a PR to main. The beta is published from
+its exact feature commit; stable 0.98 remains unchanged. Real Karoo acceptance is
+pending. No physical device installation or legacy release workflow is used.
+
+## Beta 1 device feedback and native fields (0.99 Beta 2 / code 12, unreleased)
+
+The user tested Beta 1 on a Karoo 3 with their latest OS and reported that live
+ride taps did not open the app, the graphical field used two cells, and no GPS
+was available near a window. An exact KOS build was not supplied. Beta 1 is not
+accepted for stable promotion. Its tag/APK remain immutable.
+
+The user chose native one-cell distance fields with an Open POIs controller
+action instead of the custom icon layout. Both existing type IDs are retained
+but registered graphical=false. startStream emits FIELD_SINGLE in metres;
+startView configures native DISTANCE formatting and explicit missing-data messages.
+Karoo handles metric/imperial presentation, headers and cell sizing. Custom
+RemoteViews and their tap action are removed. The pinned SDK declares custom
+views graphical and exposes no minimum-width attribute. Actual native cell
+placement remains a firmware/device check; the Android emulator cannot prove it.
+
+Open POIs is a BonusAction routed by the extension to MainActivity's POIs intent.
+It is a controller binding, not a tap handler on a native numeric field. Users
+may need to remove/re-add old fields after upgrading to refresh their host layout.
+The editor uses Karoo's own numeric sample treatment rather than our old preview.
+
+GPS collection has an independently cancellable connection per native stream.
+Missing/disconnected/stale (>30s) GPS yields No GPS; nearest searches need packs,
+and no selected target yields Select POI without GPS or any pack read. Exceptions
+are locally logged and do not fabricate a location or zero distance. No permission
+or external location fallback is added. Selecting a destination from POIs/Favorites
+still persists before native-map launch, independently of a GPS fix.
+
+Arrival monitoring follows the native stream subscription, rather than a graphical
+view. It only observes fixes while that stream is subscribed; no always-on location
+service is added. Shared messages between the native view and stream are StateFlow.
+The Open POIs controller action and native cell allocation need hardware retesting.
+
+References: pinned DataTypeImpl, ViewEvent and official sample Extension BonusAction
+implementation in hammerheadnav/karoo-ext 1.1.9. Native editor sample limitations are
+tracked in SDK issue #93. The prior preview-click emulator test is replaced by
+native stream/lifecycle and controller-intent coverage; it did not establish that
+Beta 1’s ride-screen tap worked. No dependency or Room schema changes.
+
+Native-field correction validation: 62 debug JVM tests, 11 focused API 35 emulator
+tests, debug lint and debug assembly passed. Changes remain local and uncommitted;
+Beta 2 is not published. Karoo retest instructions are in LOCAL_TESTING.md.
+
+## 0.99 Beta 2 release preparation (2026-10-23)
+
+For v0.99-beta.2 (0.99/code 12), all 62 release JVM tests, release lint and optimized
+signed assembly passed. The earlier 62 debug JVM and 11 focused API 35 emulator
+tests plus debug lint/assembly passed. Full emulator instrumentation was not rerun.
+The candidate uses the established signing identity and immutable Beta 2 URLs;
+package/version, certificate, APK hash and public upload checksums are verified
+before publication and recorded with the clean source commit in build-info.json.
+
+PR #9 targets main and is updated for native fields and the Open POIs controller
+action. Stable 0.98 and distributed Beta 1 remain unchanged. Beta 2 device testing
+is pending, including actual one-cell sizing, controller dispatch, units and
+outdoor GPS/arrival behavior. No physical device install or legacy workflow is used.
+
+## POI trailing distances and swipe Favorites (0.99 Beta 3 / code 13)
+
+Requested after real-device list feedback, implemented on a new feature branch
+codex/poi-list-swipe, with publication and updating PR #9 explicitly authorized.
+The distance badge occupies the trailing row slot; there is no favorite IconButton.
+A gold star follows the name only for stored POIs, with space reserved so an
+ellipsized long name does not hide its marker. Details remain type followed by
+address/coordinates. Missing GPS/distance leaves the trailing slot empty.
+
+Material 3 SwipeToDismissBox (already present in the pinned dependency set) enables
+only EndToStart. Reaching the dismissed anchor toggles Favorites once and resets
+the swipe; incomplete/reverse gestures do not toggle. rememberUpdatedState keeps
+the latest POI and callback when Room updates the same list key. In Favorites,
+unbookmarking can remove that item before reset. The row remains the map-opening
+click target, including its distance badge. Named custom accessibility actions
+provide the same toggle without requiring a gesture. Existing focus dismissal and
+paging remain. No Room schema, new permission, dependency or telemetry change.
+
+Beta 2 was published at 6d09836510ad91929c4460be884251f7aa7a4f69, APK SHA-256
+123e3eaf8b6c8b95a28c18d2c966d9605e7721f1c6d6afc946643259d3a73709. It remains a
+prerelease pending device acceptance. Beta 3 advances versionCode to 13 while
+retaining the cohesive 0.99 batch. Stable 0.98 and prior beta assets remain intact.
+
+POI list verification: 62 debug JVM tests, 13 focused API 35 emulator tests, debug
+lint and assembly passed. Saved-row and long-name screenshots were inspected at
+480x800. Detailed gesture coverage and initial test fixes are in LOCAL_TESTING.md.
+
+Beta 3 follow-up before publication: swipe action cues are plus + a star icon in
+a muted Hammerhead yellow, or minus + star in muted red for removal. No visible
+Add/Remove sentence is needed; named accessibility actions remain. A first-row
+48dp left-and-spring-back hint runs once after the initial populated POI list
+appears, only after Favorites and preferences load and when no Favorites exist.
+DataStore poiSwipeHintSeen persists the shown state, including after restart or
+subsequent removal of all Favorites. Touch interrupts the cosmetic offset. The
+hint does not change SwipeToDismissBox state, select POIs or toggle Favorites.
+No first-use flag is consumed while there are no rows to demonstrate.
+
+## 0.99 Beta 3 release preparation (2026-10-23)
+
+Final candidate v0.99-beta.3 (0.99/code 13) passed 63 debug and 63 release JVM
+tests, 16 focused API 35 emulator tests, debug/release lint, debug assembly and
+optimized signed release assembly. Add/remove cue, first-row hint, saved-row and
+long-name screenshots were visually inspected at 480x800. Candidate package,
+version/code, established signing certificate, immutable URLs and APK SHA-256
+are verified before upload and recorded with the clean source commit.
+
+The user explicitly authorized the POI row changes, muted cues, one-time hint,
+commit/build/publication and updating PR #9. Source is prepared on a new feature
+branch and fast-forwarded into the existing PR's head, preserving review to main.
+Stable 0.98 and Beta 1/Beta 2 assets remain unchanged. Beta 3 device acceptance is
+pending; no physical installation, full emulator suite or legacy workflow run.
+
+## Tappable field variants (unreleased Beta 4)
+
+The six registered types share nearest/selected stream behavior. Existing native IDs
+remain numeric. New `-tappable` IDs use graphical RemoteViews, and experimental
+`-compact-tappable` IDs attempt RemoteViews on numeric registrations. The latter
+is outside documented SDK custom-view guidance and may be ignored by Karoo.
+Activity PendingIntents target MainActivity directly, skip profile previews, and
+remain attached for all missing-data states. Custom tiles currently use metric
+labels; native fields retain rider-unit formatting. Host sizing is controlled by
+Karoo and real ride dispatch is not established by applying RemoteViews locally.
+
+## 0.99 Beta 4 release preparation (2026-10-24)
+
+Candidate v0.99-beta.4 uses 0.99/code 14. Passed 63 debug and 63 release JVM tests,
+six focused API 35 PoiFieldTest cases, debug/release lint, debug assembly and
+optimized signed release assembly. The applied RemoteViews click test verifies
+the app intent locally; actual Karoo ride host dispatch and graphical/compact
+allocation are still device checks. Custom-view lifecycle tests cover refresh
+without a native subscription and cancellation of location collection.
+
+The user authorized updating PR #9 and publishing this beta. Source and version
+changes stay on the PR branch targeting main. Publication uses the exact committed
+source and established signing identity with candidate-specific metadata and
+checksums. No physical installation or full emulator suite was performed. Device
+acceptance is pending; stable/latest and all earlier candidate assets are retained.
+
+## Extension startup correction (unreleased Beta 5)
+
+KarooExtension validates its ID in the constructor and rejects periods. The
+previous package-shaped ID prevented the service from being instantiated,
+although field metadata was still discoverable. Use `waypoints` consistently in
+the service, field data-type IDs and extension XML; keep the Android package
+identity unchanged. Existing Karoo field/controller bindings need re-adding.
+Tests now construct the service and bind the actual manifest service through
+IKarooExtension to dispatch every registered view, rather than only directly
+calling field implementations. Real ViewEmitter also throttles updates at 900ms;
+custom rendering now waits 1000ms and uses the latest reading to avoid dropping
+an immediate state transition. These fixes do not establish host sizing/taps.
+
+Final Beta 5 local checks: 63 debug JVM tests and all nine focused API 35 emulator
+cases passed, zero failures/skips; debug lint and debug assembly passed. Service
+construction, actual manifest service binding and all six stream/view dispatches
+now pass. The real SDK emitter delivers the delayed Select POI tile. An intermediate
+integration-test assertion raced the stream's valid No POIs result against its
+initial No GPS preview; the test now verifies the preview before starting the
+stream. No release build, commit, push, tag, publication, full emulator suite or
+physical Karoo test was performed for this fix. Actual Karoo taps and compact
+allocation remain pending; a corrected Beta 5 is proposed for device retesting.
+
+## 0.99 Beta 5 release preparation (2026-10-24)
+
+Candidate v0.99-beta.5 uses version 0.99/code 15 and the established signing key.
+Passed 63 debug and 63 release JVM tests, nine focused API 35 emulator tests,
+debug/release lint, debug assembly and optimized signed release assembly. The
+previous constructor failure was reproduced before the fix; actual manifest
+service binding, all six stream/view dispatches and the real SDK emitter status
+transition now pass. Karoo ride-host taps/sizing and GPS/arrival retesting remain
+pending. No physical installation or full emulator suite was performed.
+
+The user authorized updating PR #9 and publishing this candidate. Source/version
+changes stay on the PR to main. Candidate artifacts record the exact committed
+source, certificate, immutable URLs and APK checksum. Remove/re-add all POI fields
+and rebind Open POIs after upgrading because the extension ID changed; keep app
+storage by upgrading without uninstalling. Stable/latest and earlier assets are
+preserved. Device acceptance is pending; no stable promotion is authorized.
+
+## POI tile details (unreleased Beta 6)
+
+Field readings now carry POI names/categories as well as distance/status. Nearest
+queries retain metadata from the winning downloaded POI; selected readings retain
+saved metadata without GPS and discard it when selection clears. Custom RemoteViews
+reuse the POI list category icon mapping and display pin, name and category/distance.
+Names use one ellipsized line to fit compact fields. Native numeric streams still
+emit raw metres. Tappable descriptions document profile-editor-only replacement.
+The user reports Beta 5 working and requests this UI refinement; no stable promotion
+or explicit acceptance of all device test cases is inferred from that feedback.
+
+Beta 6 local verification passed: 63 debug JVM tests, 11 focused API 35 emulator
+cases, debug lint and debug assembly. RemoteViews previews at 240x100dp and
+120x80dp were visually inspected for long-name truncation and icon/distance layout.
+Names/categories update even at unchanged distance; selected details survive
+missing GPS and disappear with selection. Actual Karoo layout/taps remain pending.
+
+Beta 6 visual follow-up uses the supplied native Karoo distance-field screenshot:
+a 12dp outline pin sits at the top-left beside the one-line POI name, and the
+category/distance row is left-aligned below it. Distance type increases to 28sp.
+The tile does not draw a border/pill because Karoo owns the field container. This
+reuses the pending Beta 6/code 16 bump; no additional version increment is needed.
+
+The latest Beta 6 layout revision keeps the outline pin/name on the left and
+right-aligns distance in the bottom row, with the category icon at the left edge.
+The name uses the remaining vertical area, wraps without ellipsis, and auto-sizes
+between 10sp and 14sp on supported Android versions. This supersedes the earlier
+one-line name and left-aligned distance mockups. Both preview sizes are checked
+for complete long-name layout, no ellipsis and distance alignment.
+
+The latest Beta 6 refinement separates the field label from POI content: the
+outline pin and localized Nearest POI/Selected POI form a persistent header.
+The body row contains category icon, full wrapping POI name, and right-aligned
+distance. Body names auto-size 8–14sp; compact distance uses 16sp to preserve room,
+graphical distance 24sp (status 20sp). This replaces the prior header-name mockup.
+
+## 0.99 Beta 6 release preparation (2026-10-24)
+
+Candidate v0.99-beta.6 uses 0.99/code 16. Passed 63 debug and 63 release JVM tests,
+11 focused API 35 emulator cases, debug/release lint, debug assembly and optimized
+signed release assembly. Final previews at 240x100dp and 120x80dp were visually
+inspected: a fixed field label sits above category/name/distance; the full long-name
+sample fits without ellipsis and distance aligns right. Compact uses smaller text.
+Actual Karoo layout/readability/tap retesting and the full emulator suite remain
+pending; no physical installation occurred.
+
+The user approved the final layout and authorized updating PR #9 and publishing
+this beta. That is not stable-promotion acceptance. Source/version changes remain
+on the PR to main. Candidate records include the exact committed source, signing
+certificate, immutable URLs and APK SHA-256. Extension/type IDs remain unchanged
+from Beta 5; upgrades from Beta 4 or older require field/controller rebinding.
+Stable/latest and all earlier candidate assets are retained.

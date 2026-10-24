@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -163,13 +164,142 @@ class OfflineHomeTest {
         val name = compose.onNodeWithText("Example cafe", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         val type = compose.onNodeWithText("Cafe", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         val address = compose.onNodeWithText("Main Street\u00A01, Kävlinge · 55.6000, 13.0000", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertTrue(distance.right < name.left)
-        assertTrue(distance.center.y >= name.top && distance.center.y <= name.bottom)
+        assertTrue(distance.left > name.right)
+        assertTrue(distance.right <= compose.onRoot().fetchSemanticsNode().boundsInRoot.right - 4f)
         assertTrue(type.top >= name.bottom)
         assertTrue(address.top >= type.bottom)
         compose.onNodeWithText("55.7000, 13.1000", useUnmergedTree = true).assertExists()
         compose.onNodeWithText("POI", useUnmergedTree = true).assertExists()
         capture("offline-poi-text-layout.png")
+    }
+
+    @Test fun swipeLeftTogglesFavoriteOnceAndKeepsDistanceOnRight() {
+        val address = Waypoint.Address(null, null, null, null, null, null, null)
+        val discovered = Waypoint.Discovered("swipe", "Riverside fountain", address, 55.6, 13.0)
+        val stored = Waypoint.Stored(1, discovered.serverId, discovered.name, address, 55.6, 13.0)
+        var row by mutableStateOf(OfflineRow(discovered, setOf("water.drinking_water"), 250.0))
+        var toggles = 0
+        var opened = 0
+        compose.setContent { AppTheme { OfflineHomeContent(OfflineUiState(ready = true,
+            invitation = false, rows = listOf(row)), OfflineActions(
+            open = { opened++ }, bookmark = {
+                toggles++
+                row = row.copy(waypoint = if (it.waypoint is Waypoint.Stored) discovered else stored)
+            })) } }
+        val item = compose.onNodeWithTag("poi-row-swipe")
+        compose.onNodeWithText("★").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Bookmark Riverside fountain").assertDoesNotExist()
+        item.performTouchInput { swipeLeft() }
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(1, toggles); assertEquals(0, opened) }
+        val name = compose.onNodeWithText("Riverside fountain", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        val star = compose.onNodeWithText("★", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        val distance = compose.onNodeWithText("250m", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        assertTrue(star.left >= name.right)
+        assertTrue(star.right < distance.left)
+        capture("offline-poi-swipe-favorite.png")
+        item.performTouchInput { swipeRight() }
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(1, toggles) }
+        item.performTouchInput { swipeLeft() }
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(2, toggles); assertEquals(0, opened) }
+        compose.onNodeWithText("★").assertDoesNotExist()
+        compose.onNodeWithText("250m").performClick()
+        compose.runOnIdle { assertEquals(1, opened); assertEquals(2, toggles) }
+        val accessibleActions = compose.onNodeWithText("Riverside fountain").fetchSemanticsNode().config[SemanticsActions.CustomActions]
+        compose.runOnIdle { assertTrue(accessibleActions.single { it.label == "Add to favorites" }.action()) }
+        compose.runOnIdle { assertEquals(3, toggles) }
+        compose.onNodeWithText("★", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test fun partialSwipeDoesNotToggleAndFavoritesCanBeRemovedWithoutGps() {
+        val saved = Waypoint.Stored(1, "favorite", "A long favorite POI name that wraps onto a second line on Karoo",
+            Waypoint.Address(null, null, null, null, null, null, null), 55.6, 13.0)
+        var rows by mutableStateOf(listOf(OfflineRow(saved, setOf("water.drinking_water"), null)))
+        var toggles = 0
+        compose.setContent { AppTheme { OfflineHomeContent(OfflineUiState(ready = true,
+            invitation = false, page = OfflinePage.FAVORITES, rows = rows), OfflineActions(bookmark = {
+                toggles++;rows = emptyList()
+            })) } }
+        val item = compose.onNodeWithTag("poi-row-favorite")
+        compose.onNodeWithText("★", useUnmergedTree = true).assertIsDisplayed()
+        capture("offline-poi-long-favorite.png")
+        compose.mainClock.autoAdvance = false
+        item.performTouchInput { swipe(start = centerRight, end = centerRight - androidx.compose.ui.geometry.Offset(width * 0.15f, 0f), durationMillis = 700) }
+        compose.mainClock.advanceTimeBy(16)
+        capture("offline-poi-remove-cue.png")
+        compose.mainClock.autoAdvance = true
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(0, toggles) }
+        item.performTouchInput { swipeLeft() }
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(1, toggles) }
+        compose.onNodeWithText("No favorites added yet.").assertExists()
+    }
+
+    private fun hintRows() = (1..2).map { index -> OfflineRow(
+        Waypoint.Discovered("hint-$index", "Fountain $index",
+            Waypoint.Address(null, null, null, null, null, null, null), 55.6, 13.0),
+        setOf("water.drinking_water"), 250.0 * index) }
+
+    @Test fun firstEmptyFavoritesVisitHintsOnlyFirstRowOnceWithoutToggling() {
+        var state by mutableStateOf(OfflineUiState(ready = true, invitation = false,
+            favoritesLoaded = false, swipeHintSeen = false, rows = hintRows()))
+        var hints = 0
+        var toggles = 0
+        compose.setContent { AppTheme { OfflineHomeContent(state, OfflineActions(
+            swipeHintShown = { hints++; state = state.copy(swipeHintSeen = true) },
+            bookmark = { toggles++ })) } }
+        compose.runOnIdle { assertEquals(0, hints) }
+        compose.mainClock.autoAdvance = false
+        compose.runOnIdle { state = state.copy(favoritesLoaded = true) }
+        compose.mainClock.advanceTimeBy(32)
+        compose.waitForIdle()
+        compose.mainClock.advanceTimeBy(560)
+        compose.waitForIdle()
+        val first = compose.onNodeWithTag("poi-content-hint-1").fetchSemanticsNode().positionInRoot
+        val second = compose.onNodeWithTag("poi-content-hint-2").fetchSemanticsNode().positionInRoot
+        assertTrue("First row must move left: $first", first.x < -4f)
+        assertEquals(0f, second.x, 1f)
+        compose.runOnIdle { assertEquals(1, hints);assertEquals(0, toggles) }
+        capture("offline-poi-swipe-hint.png")
+        compose.mainClock.advanceTimeBy(2000)
+        compose.mainClock.autoAdvance = true
+        compose.waitForIdle()
+        assertEquals(0f, compose.onNodeWithTag("poi-content-hint-1").fetchSemanticsNode().boundsInRoot.left, 1f)
+        compose.runOnIdle { state = state.copy(page = OfflinePage.FAVORITES) }
+        compose.runOnIdle { state = state.copy(page = OfflinePage.POIS) }
+        compose.runOnIdle { assertEquals(1, hints);assertEquals(0, toggles) }
+    }
+
+    @Test fun favoritesOrPreviouslySeenHintNeverAnimate() {
+        var state by mutableStateOf(OfflineUiState(ready = true, invitation = false,
+            favoritesLoaded = true, hasFavorites = true, swipeHintSeen = false, rows = hintRows()))
+        var hints = 0
+        compose.setContent { AppTheme { OfflineHomeContent(state, OfflineActions(swipeHintShown = { hints++ })) } }
+        compose.runOnIdle { assertEquals(0, hints) }
+        compose.runOnIdle { state = state.copy(hasFavorites = false, swipeHintSeen = true) }
+        compose.runOnIdle { assertEquals(0, hints) }
+        assertEquals(0f, compose.onNodeWithTag("poi-content-hint-1").fetchSemanticsNode().boundsInRoot.left, 1f)
+    }
+
+    @Test fun touchingHintStopsItWithoutChangingFavorites() {
+        var state by mutableStateOf(OfflineUiState(ready = true, invitation = false,
+            favoritesLoaded = true, swipeHintSeen = false, rows = hintRows()))
+        var opened = 0
+        var toggles = 0
+        compose.mainClock.autoAdvance = false
+        compose.setContent { AppTheme { OfflineHomeContent(state, OfflineActions(
+            swipeHintShown = { state = state.copy(swipeHintSeen = true) }, open = { opened++ }, bookmark = { toggles++ })) } }
+        compose.mainClock.advanceTimeBy(560)
+        compose.waitForIdle()
+        compose.onNodeWithTag("poi-row-hint-1").performTouchInput { click(center) }
+        compose.mainClock.advanceTimeBy(32)
+        compose.mainClock.autoAdvance = true
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(1, opened);assertEquals(0, toggles) }
+        assertEquals(0f, compose.onNodeWithTag("poi-content-hint-1").fetchSemanticsNode().boundsInRoot.left, 1f)
     }
 
     private fun capture(name: String) {

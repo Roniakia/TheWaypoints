@@ -18,4 +18,18 @@
     <string name="distance_km_formatted">%1s\nkm</string>
     <string name="distance_feet_formatted">%1s\npd</string> <!-- "pd" for "piedi" (feet) -->
     <string name="distance_meters_formatted">%1s\nm</string>
+    <string name="poi_field_name">POI più vicino</string>
+    <string name="poi_field_description">Distanza dal POI scaricato più vicino.</string>
+    <string name="poi_field_no_pois">Nessun POI</string>
+    <string name="poi_field_no_gps">Nessun GPS</string>
+    <string name="poi_field_selected_name">POI selezionato</string>
+    <string name="poi_field_selected_description">Distanza dal POI selezionato nell’app. Si cancella all’arrivo.</string>
+    <string name="poi_field_select">Scegli POI</string>
+    <string name="poi_field_open">Apri POI</string>
+    <string name="poi_field_nearest_tappable">POI più vicino · toccabile</string>
+    <string name="poi_field_selected_tappable">POI selezionato · toccabile</string>
+    <string name="poi_field_nearest_compact">POI più vicino · compatto sperimentale</string>
+    <string name="poi_field_selected_compact">POI selezionato · compatto sperimentale</string>
+    <string name="poi_field_tappable_description">Tocca per aprire i POI. Campo grafico; Karoo controlla le dimensioni. Distanza in metri/chilometri. Modifica o sostituisci questo campo nell’editor del profilo; la modifica con pressione prolungata non è disponibile.</string>
+    <string name="poi_field_compact_description">Campo toccabile sperimentale a una cella. Karoo potrebbe non supportare la visualizzazione o i tocchi. Distanza in metri/chilometri. Modifica o sostituisci questo campo nell’editor del profilo; la modifica con pressione prolungata non è disponibile.</string>
 </resources>

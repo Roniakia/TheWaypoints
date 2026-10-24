@@ -2,5 +2,25 @@
 <ExtensionInfo
     displayName="@string/app_name"
     icon="@mipmap/ic_launcher"
-    id="io.github.roniakia.waypoints"
-    scansDevices="false" />
+    id="waypoints"
+    scansDevices="false">
+    <DataType typeId="nearest-poi" graphical="false"
+        displayName="@string/poi_field_name" description="@string/poi_field_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="selected-poi" graphical="false"
+        displayName="@string/poi_field_selected_name" description="@string/poi_field_selected_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="nearest-poi-tappable" graphical="true"
+        displayName="@string/poi_field_nearest_tappable" description="@string/poi_field_tappable_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="nearest-poi-compact-tappable" graphical="false"
+        displayName="@string/poi_field_nearest_compact" description="@string/poi_field_compact_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="selected-poi-tappable" graphical="true"
+        displayName="@string/poi_field_selected_tappable" description="@string/poi_field_tappable_description"
+        icon="@drawable/ic_poi_pin" />
+    <DataType typeId="selected-poi-compact-tappable" graphical="false"
+        displayName="@string/poi_field_selected_compact" description="@string/poi_field_compact_description"
+        icon="@drawable/ic_poi_pin" />
+    <BonusAction actionId="open-pois" displayName="@string/poi_field_open" />
+</ExtensionInfo>

@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     exitTransition = { ExitTransition.None }
                 ) {
                     composable(Screen.WaypointsList.route) {
-                        OfflineHome()
+                        OfflineHome(openPois = intent.action == de.dimskiy.waypoints.platform.karooservices.OPEN_POIS)
                     }
                 }
             }

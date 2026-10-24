@@ -127,5 +127,50 @@ in the local testing guide.
 
 ## Release notes
 
+Development 0.99 Beta 3 (code 13) moves POI distances to the right and toggles Favorites with a right-to-left swipe. Favorited names show a gold star. Muted swipe cues and a one-time first-row hint demonstrate the gesture. Native single-cell POI fields and the Open POIs controller action are retained.
+
 See [RELEASE_NOTES.md](RELEASE_NOTES.md) for version history and changelogs.
 For manual beta publishing and stable promotion, see [the release guide](docs/RELEASING.md).
+
+## 0.99 Beta 4 candidate
+
+Version 0.99/code 14; candidate `v0.99-beta.4`; device acceptance pending.
+
+- Retain native one-cell Nearest POI and Selected POI fields and the Open POIs controller action.
+- Add tappable graphical variants for both modes, opening the POI list even without GPS.
+- Add separately named experimental compact tappable variants for both modes.
+  Karoo may ignore custom rendering/taps on these numeric registrations; one-cell operation is unverified.
+- Graphical/compact tiles display metres/kilometres; native fields retain Karoo unit formatting.
+  Nearest searches downloaded POIs; selected uses the saved target and existing arrival clearing.
+- No data migration or dependency change. Actual ride tapping and host sizing need Karoo testing.
+
+## 0.99 Beta 5 candidate
+
+Version 0.99/code 15; candidate `v0.99-beta.5`; device acceptance pending.
+
+- Fix extension service startup: use a dot-free Karoo extension ID instead of the
+  Android package ID, which the SDK rejects before any field can run. This caused
+  the live No Sensor state and prevented custom field taps from being installed.
+- Remove and re-add existing POI ride fields after upgrading; their Karoo extension
+  identity changes. Rebind the Open POIs controller action too. Favorites, downloaded
+  packs and selected destination remain in the same app storage.
+- Pace custom tile updates to preserve initial No POIs/Select POI states instead of
+  having the SDK discard updates sent immediately after the initial No GPS tile.
+- Retain nearest-downloaded and last-selected modes across all six field choices.
+  Compact one-cell taps remain experimental; actual ride-host behavior needs retest.
+- No dependency change, new permission or database migration.
+
+## 0.99 Beta 6 candidate
+
+Version 0.99/code 16; candidate `v0.99-beta.6`; device acceptance pending.
+
+- Show the POI name and category icon in graphical and experimental compact
+  tappable fields. A small outline pin and Nearest POI/Selected POI label form
+  the header; below, the category icon and full wrapping name stay left with the
+  distance at the right edge. Selected details remain visible without GPS.
+- Nearest fields update details from the nearest downloaded POI; selected fields
+  show the last selected destination and clear its details with confirmed arrival.
+- Tappable field descriptions explain that changing/replacing the field requires
+  the profile editor; long-press editing is unavailable. All supported locales updated.
+- Retain native numeric fields, existing tap actions and the valid extension ID.
+  No dependency change or data migration. Compact allocation remains experimental.

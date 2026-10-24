@@ -17,4 +17,18 @@
     <string name="distance_km_formatted">%1s\nkm</string>
     <string name="distance_feet_formatted">%1s\npieds</string>
     <string name="distance_meters_formatted">%1s\nm</string>
+    <string name="poi_field_name">POI le plus proche</string>
+    <string name="poi_field_description">Distance au POI téléchargé le plus proche.</string>
+    <string name="poi_field_no_pois">Aucun POI</string>
+    <string name="poi_field_no_gps">Sans GPS</string>
+    <string name="poi_field_selected_name">POI sélectionné</string>
+    <string name="poi_field_selected_description">Distance au POI sélectionné dans l’application. Effacé à l’arrivée.</string>
+    <string name="poi_field_select">Choisir POI</string>
+    <string name="poi_field_open">Ouvrir les POIs</string>
+    <string name="poi_field_nearest_tappable">POI le plus proche · tactile</string>
+    <string name="poi_field_selected_tappable">POI sélectionné · tactile</string>
+    <string name="poi_field_nearest_compact">POI le plus proche · compact expérimental</string>
+    <string name="poi_field_selected_compact">POI sélectionné · compact expérimental</string>
+    <string name="poi_field_tappable_description">Touchez pour ouvrir les POI. Champ graphique ; Karoo contrôle la taille. Distance en mètres/kilomètres. Modifiez ou remplacez ce champ dans l’éditeur de profil ; la modification par appui long est indisponible.</string>
+    <string name="poi_field_compact_description">Champ tactile expérimental à une case. Karoo peut ne pas prendre en charge son affichage ou le toucher. Distance en mètres/kilomètres. Modifiez ou remplacez ce champ dans l’éditeur de profil ; la modification par appui long est indisponible.</string>
 </resources>

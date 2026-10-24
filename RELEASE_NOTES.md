@@ -1,5 +1,106 @@
 # Release notes
 
+### v0.99 — Beta 6, 2026-10-24
+
+Version 0.99/code 16; candidate `v0.99-beta.6`; device acceptance pending.
+
+- Show the POI name and category icon in graphical and experimental compact
+  tappable fields. A small outline pin and Nearest POI/Selected POI label form
+  the header; below, the category icon and full wrapping name stay left with the
+  distance at the right edge. Selected details remain visible without GPS.
+- Nearest fields update details from the nearest downloaded POI; selected fields
+  show the last selected destination and clear its details with confirmed arrival.
+- Tappable field descriptions explain that changing/replacing the field requires
+  the profile editor; long-press editing is unavailable. All supported locales updated.
+- Retain native numeric fields, existing tap actions and the valid extension ID.
+  No dependency change or data migration. Compact allocation remains experimental.
+
+### v0.99 — Beta 5, 2026-10-24
+
+Version 0.99/code 15; candidate `v0.99-beta.5`; device acceptance pending.
+
+- Fix extension service startup: use a dot-free Karoo extension ID instead of the
+  Android package ID, which the SDK rejects before any field can run. This caused
+  the live No Sensor state and prevented custom field taps from being installed.
+- Remove and re-add existing POI ride fields after upgrading; their Karoo extension
+  identity changes. Rebind the Open POIs controller action too. Favorites, downloaded
+  packs and selected destination remain in the same app storage.
+- Pace custom tile updates to preserve initial No POIs/Select POI states instead of
+  having the SDK discard updates sent immediately after the initial No GPS tile.
+- Retain nearest-downloaded and last-selected modes across all six field choices.
+  Compact one-cell taps remain experimental; actual ride-host behavior needs retest.
+- No dependency change, new permission or database migration.
+
+### v0.99 — Beta 4, 2026-10-24
+
+Version 0.99/code 14; candidate `v0.99-beta.4`; device acceptance pending.
+
+Device test reported No Sensor and no field taps. The Beta 5 investigation
+reproduced a service constructor crash from the dotted extension ID; Beta 4
+should not be considered a working field candidate.
+
+- Retain native one-cell Nearest POI and Selected POI fields and the Open POIs controller action.
+- Add tappable graphical variants for both modes, opening the POI list even without GPS.
+- Add separately named experimental compact tappable variants for both modes.
+  Karoo may ignore custom rendering/taps on these numeric registrations; one-cell operation is unverified.
+- Graphical/compact tiles display metres/kilometres; native fields retain Karoo unit formatting.
+  Nearest searches downloaded POIs; selected uses the saved target and existing arrival clearing.
+- No data migration or dependency change. Actual ride tapping and host sizing need Karoo testing.
+
+### v0.99 — Beta 3, 2026-10-23
+
+Version 0.99/code 13; candidate `v0.99-beta.3`; device acceptance pending. Earlier beta assets remain unchanged.
+
+- Move the yellow POI distance badge to the right-hand position formerly used by
+  the favorite toggle, leaving more room beside the POI name.
+- Show a gold star immediately after a favorited POI name. Unfavorited POIs
+  have no star. Long names can wrap while retaining a visible favorite marker.
+- Swipe a POI from right to left to add/remove it from Favorites. A completed
+  swipe toggles once; partial or reverse swipes do not. The row returns to rest.
+- Apply the same gesture in Favorites, where removing an item removes its row.
+  Accessibility services get named Add to favorites/Remove from favorites actions.
+- Swipe cues show muted Hammerhead-colored +star when adding and muted-red minus-star
+  when removing. A first-use swipe-and-return hint on the first POI demonstrates
+  the gesture only for users with no Favorites; its shown state is remembered.
+- Tapping the row or distance still selects the POI and opens Karoo’s map.
+  Native single-cell ride fields and Open POIs controller action are retained.
+
+### v0.99 — Beta 2, 2026-10-23
+
+Version 0.99/code 12; candidate `v0.99-beta.2`. Published Beta 1 remains unchanged.
+
+- Replace graphical POI tiles with native numeric distance fields so each can use
+  one normal cell. Karoo formats straight-line distances in the rider’s units;
+  the custom pin/category layout and field-tap action are removed.
+- Add Open POIs as a Karoo controller BonusAction. It opens the POI list without
+  requiring GPS; tapping a POI/Favorite still saves it before native-map launch.
+- Show No GPS, No POIs or Select POI explicitly, without blocking field setup
+  on GPS or a service connection. Invalid/stale fixes never become zero distance.
+- Selected-target arrival confirmation now follows the native stream lifecycle;
+  two distinct fresh fixes within 50m clear the target, preserving replacements.
+- After upgrading, remove/re-add the two fields if Karoo retains the old graphical
+  layout. Bind Open POIs in the Karoo controller configuration. Actual firmware
+  layout and controller dispatch still require a device retest.
+
+### v0.99 — Beta 1, 2026-10-23
+
+Version 0.99 (code 11), candidate `v0.99-beta.1`; real Karoo acceptance pending.
+
+- Add the Nearest POI Karoo ride data field, designed for a single cell: a small
+  pin above the nearest downloaded POI category icon and compact metric distance.
+- Add a separate Selected POI field. Tapping a POI or Favorite saves it as the
+  destination and opens the native Karoo map. The selection survives restarts
+  and region removal; selecting another POI replaces it.
+- Automatically clear the selected destination after two distinct fresh GPS
+  fixes within 50 metres while the field is active. An old arrival check cannot
+  clear a replacement selection. An empty field says Select POI.
+- Tap either field to open the app on POIs. The profile editor shows a sample; the
+  live field reports missing GPS or POIs and clears GPS older than 30 seconds.
+- Uses all downloaded categories independently of app filters; distances are
+  straight-line, refreshed every five seconds while visible, with no network
+  requests. Nearest POI excludes Favorites; Selected POI supports them. Version
+  0.99/code 11.
+
 ### v0.98 — unreleased (Beta 1 prepared locally)
 
 - Settings replaces Check for updates with Download and install when the chosen

@@ -23,6 +23,7 @@ enum class OfflinePage { POIS, FAVORITES, REGIONS, SETTINGS }
 data class OfflineRow(val waypoint: Waypoint, val categories: Set<String>, val distanceMetres: Double?)
 data class RegionDownloadStatus(val state: WorkInfo.State, val percent: Int, val error: String?, val phase: String = "download")
 data class OfflineUiState(
+    val favoritesLoaded: Boolean = false, val hasFavorites: Boolean = false, val swipeHintSeen: Boolean = true,
     val ready: Boolean = false, val page: OfflinePage = OfflinePage.POIS, val invitation: Boolean = true,
     val catalogue: VerifiedCatalogue? = null, val installed: List<InstalledRegion> = emptyList(),
     val recommended: List<String> = emptyList(), val selected: Set<String> = emptySet(), val regionQuery: String = "",
@@ -39,21 +40,24 @@ class OfflineViewModel @Inject constructor(
     private val locations: LocationsProvider, private val openMap: OpenExternalMap,
     private val preferences: DataStore<Preferences>,
     @BaseModule.DispatcherIO private val io: CoroutineDispatcher,
+    private val selectedPoi: SelectedPoiRepository,
 ) : ViewModel() {
     private val mutable = MutableStateFlow(OfflineUiState())
     val state = mutable.asStateFlow()
     @Volatile private var saved = emptyList<Waypoint.Stored>()
     private var searchJob: Job? = null
     private var previewJob: Job? = null
+    private val swipeHintSeenKey = booleanPreferencesKey("poiSwipeHintSeen")
     private val dismissed = booleanPreferencesKey("offlineRegionsInvitationDismissed")
 
     init {
         viewModelScope.launch {
             try {
                 val initial = withContext(io) { catalogue.load() to storeProvider.get().installed() }
-                val invitation = preferences.data.first()[dismissed] != true
+                val prefs = preferences.data.first()
+                val invitation = prefs[dismissed] != true
                 mutable.update { it.copy(ready = true, catalogue = initial.first, installed = initial.second,
-                    invitation = invitation, page = it.page,
+                    invitation = invitation, page = it.page, swipeHintSeen = prefs[swipeHintSeenKey] == true,
                     recommended = recommendations(initial.first, it.position)) }
                 search()
                 refreshCatalogue(announceFailure = false)
@@ -62,6 +66,7 @@ class OfflineViewModel @Inject constructor(
         viewModelScope.launch {
             bookmarks.observeWaypointsStored().catch { report(it as? Exception ?: RuntimeException(it)) }.collect { values ->
                 saved = values
+                mutable.update { it.copy(favoritesLoaded = true, hasFavorites = values.isNotEmpty()) }
                 if ((mutable.value.page == OfflinePage.FAVORITES)) search() else mutable.update { state -> state.copy(rows = state.rows.map { row ->
                     val waypoint = saved.firstOrNull { it.serverId == row.waypoint.serverId } ?: row.waypoint.let {
                         Waypoint.Discovered(it.serverId, it.name, it.address, it.latitude, it.longitude)
@@ -112,6 +117,11 @@ class OfflineViewModel @Inject constructor(
         mutable.update { it.copy(page = page, poiQuery = options.query, types = options.types,
             sort = options.sort, rows = emptyList(), total = 0, hasMore = false, filterCount = null) }
         if (page == OfflinePage.POIS || page == OfflinePage.FAVORITES) search() else searchJob?.cancel()
+    }
+    fun swipeHintShown() = viewModelScope.launch {
+        mutable.update { it.copy(swipeHintSeen = true) }
+        try { preferences.edit { it[swipeHintSeenKey] = true } }
+        catch (failure: Exception) { report(failure) }
     }
     fun regionQuery(query: String) { mutable.update { it.copy(regionQuery = query) } }
     fun select(ids: Set<String>, checked: Boolean) { mutable.update { it.copy(selected = if (checked) it.selected + ids else it.selected - ids) } }
@@ -208,7 +218,11 @@ class OfflineViewModel @Inject constructor(
         } catch (failure: Exception) { report(failure) }
     }
     fun open(row: OfflineRow) = viewModelScope.launch {
-        try { withTimeout(15_000) { openMap(row.waypoint) } }
+        try {
+            selectedPoi.select(row.waypoint.name,
+                PoiPosition(row.waypoint.latitude, row.waypoint.longitude), row.categories)
+            withTimeout(15_000) { openMap(row.waypoint) }
+        }
         catch (cancelled: TimeoutCancellationException) { mutable.update { it.copy(message = "Karoo map service is unavailable.") } }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { report(failure) }
